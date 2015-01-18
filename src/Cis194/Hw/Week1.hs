@@ -5,19 +5,25 @@ module Cis194.Hw.Week1 where
 -------------
 
 toDigits :: Integer -> [Integer]
-toDigits x = [x]
+toDigits x = reverse (toDigitsRev x)
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev x = [x]
+toDigitsRev x
+    | x <= 0 = []
+    | otherwise = (mod x 10) : toDigitsRev (div x 10)
 
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther xs = xs
+doubleEveryOther (x1:x2:xs) = x1 : (2 * x2) : doubleEveryOther xs
+doubleEveryOther x = x
 
 sumDigits :: [Integer] -> Integer
-sumDigits _ = 0
+sumDigits = (foldr (+) 0)
+
+composeInt :: Integer -> Integer
+composeInt x = sumDigits (concatMap (toDigitsRev $) (doubleEveryOther (toDigitsRev x)))
 
 validate :: Integer -> Bool
-validate _ = False
+validate x = (mod (composeInt x) 10) == 0
 
 ---------------------
 -- Towers of Hanoi --
