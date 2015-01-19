@@ -33,7 +33,10 @@ type Peg = String
 type Move = (Peg, Peg)
 
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
-hanoi _ _ _ _ = []
+hanoi 0 _ _ _ = []
+hanoi n a b c = (hanoi (n-1) a c b) ++ [(a,b)] ++ (hanoi (n-1) c b a)
+-- according to the HW:
+-- length (hanoi 15 "a" "b" "c") == 32767
 
 hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
 hanoi4 _ _ _ _ _ = []
