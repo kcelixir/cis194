@@ -3,6 +3,14 @@ module Cis194.Hw.Week1 where
 -------------
 -- Ex 1-4  --
 -------------
+--1
+lastDigit :: Integer -> Integer
+lastDigit 0 = 0
+lastDigit n = n `mod` 10
+
+dropLastDigit :: Integer -> Integer
+dropLastDigit 0 = 0
+dropLastDigit n = ( n - lastDigit n) `div` 10
 
 toDigits :: Integer -> [Integer]
 toDigits x = [x]
@@ -18,6 +26,7 @@ sumDigits _ = 0
 
 validate :: Integer -> Bool
 validate _ = False
+
 
 ---------------------
 -- Towers of Hanoi --
