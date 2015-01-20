@@ -1,33 +1,37 @@
 module Cis194.Hw.Week1 where
 
--------------
--- Ex 1-4  --
--------------
-
+-- Exercise 1
 toDigits :: Integer -> [Integer]
-toDigits x = [x]
+toDigits n = reverse (toDigitsRev n)
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev x = [x]
+toDigitsRev n
+  | n <= 0    = []
+  | otherwise = (n `mod` 10) : toDigitsRev (n `div` 10)
 
-doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther xs = xs
+-- Exercise 2
+doubleEveryOther  :: [Integer] -> [Integer]
+doubleEveryOther xs = reverse (double (reverse xs))
 
+double :: [Integer] -> [Integer]
+double [] = []
+double [x] = [x]
+double (x:(y:zs)) = x : (y*2) : double zs
+
+-- Exercise 3
 sumDigits :: [Integer] -> Integer
-sumDigits _ = 0
+sumDigits xs = sum (concat (map toDigits xs))
 
+-- Exercise 4
 validate :: Integer -> Bool
-validate _ = False
+validate x = (sumDigits (doubleEveryOther (toDigits x))) `mod` 10 == 0
 
----------------------
--- Towers of Hanoi --
----------------------
-
+-- Exercise 5
 type Peg = String
 type Move = (Peg, Peg)
-
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
-hanoi _ _ _ _ = []
-
-hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
-hanoi4 _ _ _ _ _ = []
+hanoi 0 _ _ _ = []
+hanoi n a b c =
+  hanoi (n-1) a c b ++
+  [(a, b)] ++
+  hanoi (n-1) c b a

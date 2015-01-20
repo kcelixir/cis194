@@ -1,5 +1,5 @@
 -- Exercise 1
-toDigits    :: Integer -> [Integer]
+toDigits :: Integer -> [Integer]
 toDigits n = reverse (toDigitsRev n)
 
 toDigitsRev :: Integer -> [Integer]
