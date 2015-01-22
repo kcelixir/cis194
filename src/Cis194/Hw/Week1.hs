@@ -13,14 +13,14 @@ toDigitsRev x
     | otherwise = (mod x 10) : toDigitsRev (div x 10)
 
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther (x1:x2:xs) = x1 : (2 * x2) : doubleEveryOther xs
+doubleEveryOther (x1:x2:xs) = (x1 * 2) : x2 : doubleEveryOther xs
 doubleEveryOther x = x
 
 sumDigits :: [Integer] -> Integer
-sumDigits = (foldr (+) 0)
+sumDigits = (foldr (+) 0) -- or sum
 
 composeInt :: Integer -> Integer
-composeInt x = sumDigits (concatMap (toDigitsRev $) (doubleEveryOther (toDigitsRev x)))
+composeInt = sumDigits . concatMap toDigitsRev . doubleEveryOther . toDigits
 
 validate :: Integer -> Bool
 validate x = (mod (composeInt x) 10) == 0
