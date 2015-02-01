@@ -6,22 +6,42 @@ module Cis194.Hw.LogAnalysis where
 import  Cis194.Hw.Log
 
 parseMessage :: String -> LogMessage
-parseMessage s = Unknown s
+parseMessage s = case (words s) of
+  "I" : time : rest -> LogMessage Info (read time) (unwords rest)
+  "W" : time : rest -> LogMessage Warning (read time) (unwords rest)
+  "E" : code : time : rest -> LogMessage (Error (read code)) (read time) (unwords rest)
+  _   -> Unknown s
 
 parse :: String -> [LogMessage]
-parse _ = []
+parse = (map parseMessage) . lines
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert _ t = t
+insert message Leaf = Node Leaf message Leaf
+insert (Unknown _) tree = tree
+insert message (Node l m r) | timeFor message > timeFor m = Node l m (insert message r)
+insert message (Node l m r) = Node (insert message l) m r
 
 build :: [LogMessage] -> MessageTree
-build _ = Leaf
+build = foldr insert Leaf
 
 inOrder :: MessageTree -> [LogMessage]
-inOrder _ = []
+inOrder Leaf = []
+inOrder (Node l m r) = (inOrder l) ++ (m:[]) ++ (inOrder r)
 
 -- whatWentWrong takes an unsorted list of LogMessages, and returns a list of the
 -- messages corresponding to any errors with a severity of 50 or greater,
 -- sorted by timestamp.
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong _ = []
+whatWentWrong = (map messageFor) . (filter severeError) . inOrder . build
+
+timeFor :: LogMessage -> Int
+timeFor (Unknown _) = 0
+timeFor (LogMessage _ time _) = time
+
+messageFor :: LogMessage -> String
+messageFor (Unknown message) = message
+messageFor (LogMessage _ _ message) = message
+
+severeError :: LogMessage -> Bool
+severeError (LogMessage (Error severity) _ _) = severity >= 50
+severeError _ = False
