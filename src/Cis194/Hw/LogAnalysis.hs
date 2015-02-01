@@ -16,13 +16,13 @@ parse :: String -> [LogMessage]
 parse = (map parseMessage) . lines
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert message Leaf = Node Leaf message Leaf
 insert (Unknown _) tree = tree
-insert message (Node l m r) | timeFor message > timeFor m = Node l m (insert message r)
-insert message (Node l m r) = Node (insert message l) m r
+insert message Leaf = Node Leaf message Leaf
+insert message (Node l m r) | timeFor message < timeFor m = Node (insert message l) m r
+insert message (Node l m r) = Node l m (insert message r)
 
 build :: [LogMessage] -> MessageTree
-build = foldr insert Leaf
+build = foldl (flip insert) Leaf
 
 inOrder :: MessageTree -> [LogMessage]
 inOrder Leaf = []
