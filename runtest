@@ -1,0 +1,1 @@
+runhaskell -isrc -itest test/Cis194/Hw/${1}Spec.hs
