@@ -46,7 +46,8 @@ inOrder (Node left msg right) = inOrder left ++ [msg] ++ inOrder right
 
 -- Exercise 5
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong msgs = map msgString (filter isRelevant (inOrder (build msgs)))
+whatWentWrong = map msgString . filter isRelevant . inOrder . build
+-- whatWentWrong msgs = map msgString (filter isRelevant (inOrder (build msgs)))
 
 isRelevant :: LogMessage -> Bool
 isRelevant (LogMessage (Error sev) _ _)
