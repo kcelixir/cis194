@@ -41,5 +41,11 @@ inOrder (Node l n r) = (inOrder l) ++ [n] ++ (inOrder r)
 -- whatWentWrong takes an unsorted list of LogMessages, and returns a list of the
 -- messages corresponding to any errors with a severity of 50 or greater,
 -- sorted by timestamp.
+filterLog :: LogMessage -> [String] -> [String]
+filterLog x@(LogMessage (Error sev) ts msg) r 
+  | sev >= 50 = [msg] ++ r
+  | otherwise = r
+filterLog _ r = r
+
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong _ = []
+whatWentWrong x = foldr filterLog [] (inOrder (build x))
