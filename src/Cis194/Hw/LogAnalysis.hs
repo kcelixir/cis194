@@ -27,7 +27,7 @@ parse x = [parseMessage l | l <- (lines x)]
 insert :: LogMessage -> MessageTree -> MessageTree
 insert (Unknown _) t = t
 insert x Leaf = Node Leaf x Leaf
-insert x@(LogMessage _ ts _) t@(Node l n@(LogMessage _ nts _) r)
+insert x@(LogMessage _ ts _) (Node l n@(LogMessage _ nts _) r)
   | ts <= nts = Node (insert x l) n r
   | ts > nts = Node l n (insert x r)
 
@@ -42,7 +42,7 @@ inOrder (Node l n r) = (inOrder l) ++ [n] ++ (inOrder r)
 -- messages corresponding to any errors with a severity of 50 or greater,
 -- sorted by timestamp.
 filterLog :: LogMessage -> [String] -> [String]
-filterLog x@(LogMessage (Error sev) ts msg) r 
+filterLog (LogMessage (Error sev) _ msg) r 
   | sev >= 50 = [msg] ++ r
   | otherwise = r
 filterLog _ r = r
