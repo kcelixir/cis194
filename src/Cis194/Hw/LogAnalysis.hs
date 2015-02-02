@@ -5,11 +5,24 @@ module Cis194.Hw.LogAnalysis where
 -- Prelude> :set -isrc/Cis194/Hw
 import  Cis194.Hw.Log
 
+parseWarning :: [String] -> LogMessage
+parseWarning (t:m) = (LogMessage Warning (read t) (unwords m))
+
+parseInfo :: [String] -> LogMessage
+parseInfo (t:m) = (LogMessage Info (read t) (unwords m))
+
+parseError :: [String] -> LogMessage
+parseError (s:t:m) = (LogMessage (Error (read s)) (read t) (unwords m))
+
 parseMessage :: String -> LogMessage
-parseMessage s = Unknown s
+parseMessage (t:s)
+  | t == 'I' = parseInfo (words s)
+  | t == 'W' = parseWarning (words s)
+  | t == 'E' = parseError (words s)
+  | otherwise = Unknown (t:s)
 
 parse :: String -> [LogMessage]
-parse _ = []
+parse x = [parseMessage l | l <- (lines x)]
 
 insert :: LogMessage -> MessageTree -> MessageTree
 insert _ t = t
