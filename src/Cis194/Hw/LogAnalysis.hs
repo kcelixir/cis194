@@ -32,7 +32,7 @@ insert x@(LogMessage _ ts _) t@(Node l n@(LogMessage _ nts _) r)
   | ts > nts = Node l n (insert x r)
 
 build :: [LogMessage] -> MessageTree
-build _ = Leaf
+build x = foldr insert Leaf (reverse x)
 
 inOrder :: MessageTree -> [LogMessage]
 inOrder _ = []
