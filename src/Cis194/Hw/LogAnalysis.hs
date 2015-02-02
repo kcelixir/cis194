@@ -25,7 +25,11 @@ parse :: String -> [LogMessage]
 parse x = [parseMessage l | l <- (lines x)]
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert _ t = t
+insert (Unknown _) t = t
+insert x Leaf = Node Leaf x Leaf
+insert x@(LogMessage _ ts _) t@(Node l n@(LogMessage _ nts _) r)
+  | ts <= nts = Node (insert x l) n r
+  | ts > nts = Node l n (insert x r)
 
 build :: [LogMessage] -> MessageTree
 build _ = Leaf
