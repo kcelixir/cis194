@@ -1,5 +1,5 @@
 -- CIS 194 Homework 2
-module Cis194.Hw.Log where
+module Log where
 
 import Control.Applicative
 
@@ -35,4 +35,4 @@ testWhatWentWrong :: (String -> [LogMessage])
                   -> IO [String]
 testWhatWentWrong parse whatWentWrong file
   = whatWentWrong . parse <$> readFile file
-  
+
