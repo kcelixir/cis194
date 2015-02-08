@@ -18,16 +18,20 @@ localMaxima (x:y:z:s)
   | y > x && y > z = [y] ++ (localMaxima (y:z:s))
   | otherwise    = localMaxima (y:z:s)
 
+-- Exercise 3 --
 histogram :: [Integer] -> String
-histogram = unlines . reverse . drawHist . hist
+-- histogram = unlines . reverse . drawHist . hist
+histogram = unlines . drawHist . hist
 
 count x = length . filter (\y -> y == x)
 
 hist :: [Integer] -> [Int]
+-- Count the frequencies of each number and store in a list
 hist a = [count n a | n <- [0..9]]
 
 drawHist :: [Int] -> [String]
-drawHist a =  ["==========\n0123456789"]++[drawRow n a | n <- [1..(maximum a)]]
+-- drawHist a =  ["==========\n0123456789"]++[drawRow n a | n <- [1..(maximum a)]]
+drawHist a =  [drawRow n a | n <- [9,8..1],n<=maximum a] ++ ["==========\n0123456789"]
 
 drawRow :: Int -> [Int] -> String
 drawRow n a = [if x >= n then '*' else ' ' | x <- a]
