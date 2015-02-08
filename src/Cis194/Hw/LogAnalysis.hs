@@ -3,7 +3,7 @@ module Cis194.Hw.LogAnalysis where
 
 -- in ghci, you may need to specify an additional include path:
 -- Prelude> :set -isrc/Cis194/Hw
-import Log
+import Cis194.Hw.Log
 
 -- Exercise 1
 
