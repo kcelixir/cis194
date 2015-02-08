@@ -19,7 +19,7 @@ localMaxima (x:y:z:s)
   | otherwise    = localMaxima (y:z:s)
 
 histogram :: [Integer] -> String
-histogram a = (unlines (reverse (drawHist (hist a))))
+histogram = unlines . reverse . drawHist . hist
 
 count x = length . filter (\y -> y == x)
 
