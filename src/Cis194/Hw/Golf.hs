@@ -1,11 +1,11 @@
 module Cis194.Hw.Golf where
--- import Data.List.Split
--- dr n = map head . chunk n
+import Data.List
 
 ----------------
 -- Exercise 1 --
 ----------------
 skips :: [a] -> [[a]]
+-- applies function s for every possible n and concats resulting lists
 skips l = [(s n l) | n <- [1..(length l)]]
 
 s :: Int -> [a] -> [a]
@@ -13,16 +13,27 @@ s :: Int -> [a] -> [a]
 -- only every nth value
 s n l = [l !! (i-1) | i <- [n,2*n..(length l)]]
 
+-- This shorter definition of s works if we take chunk from the 'split' package:
+--  import Data.List.Split
+--  s n = map last . chunk n
+
 ----------------
 -- Exercise 2 --
 ----------------
 localMaxima :: [Integer] -> [Integer]
-localMaxima [] = []
-localMaxima [_] = []
-localMaxima [_,_] = []
-localMaxima (x:y:z:s)
-  | y > x && y > z = [y] ++ (localMaxima (y:z:s))
-  | otherwise    = localMaxima (y:z:s)
+-- take first three elements, while labeling tail of list as 't'
+-- include y if it is greater that neighbors x and z
+-- recur to localMaxima of the tail t
+localMaxima (x:t@(y:z:_))
+  | y > x && y > z = y : localMaxima t
+  | otherwise      = localMaxima t
+localMaxima _ = []
+
+-- one line version using list comprehension:
+-- 'tails' takes list and progressively removes the head
+-- we then filter that for local maximi
+-- result is filtered list
+localMaxima a = [y | (x:y:z:_) <- tails a, x < y && y > z]
 
 ----------------
 -- Exercise 3 --
