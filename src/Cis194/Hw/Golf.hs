@@ -59,9 +59,11 @@ g :: [Integer] -> [Int]
 g a = [c n a | n <- [0..9]]
 
 c :: Integer -> [Integer] -> Int
--- counts how many of item x are in a list
+-- Counts how many of item x are in a list
+-- first filter the list by the given item (using partial function!)
+-- then count the length of the remaining list
 
-c x = length . filter (\y -> y == x)
+c n = length . filter (==n)
 
 f :: [Int] -> [String]
 -- Draw histogram using a list, a, of frequencies
