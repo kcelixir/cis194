@@ -68,8 +68,7 @@ c n = length . filter (==n)
 f :: [Int] -> [String]
 -- Draw histogram using a list, a, of frequencies
 
-f a =  [r n a | n <- [9,8..1], n <= maximum a] 
-    ++ ["==========\n0123456789"]
+f a =  [r n a | n <- [9,8..1], n <= maximum a] ++ ["==========\n0123456789"]
 
 r :: Int -> [Int] -> String
 -- Draw row n of the histogram, using list, a, of frequencies
