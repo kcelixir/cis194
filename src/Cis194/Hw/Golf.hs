@@ -24,9 +24,7 @@ localMaxima lst =
 
 -- Exercise 3
 histogram :: [Int] -> String
-histogram lst = rows lst ++ footer
-  where
-    footer = "==========\n0123456789\n"
+histogram lst = rows lst ++ "==========\n0123456789\n"
 
 rows :: [Int] -> String
 rows lst = concatMap(\x -> (buildRow x f)) (reverse [1..m])
@@ -35,7 +33,6 @@ rows lst = concatMap(\x -> (buildRow x f)) (reverse [1..m])
     m = maxRow (frequencies lst)
 
 frequencies :: [Int] -> [(Int, Int)]
--- frequencies = map (\xs -> (head xs, length xs)) . group . sort
 frequencies lst = map (\x -> (x, (length (filter (==x) lst)))) [0..9]
 
 maxRow :: [(Int, Int)] -> Int
