@@ -59,6 +59,11 @@ localMaxima a = [y | (x:y:z:_) <- tails a, x < y && y > z]
 histogram :: [Integer] -> String
 histogram = unlines . f . g
 
+-- Draw histogram using a list, a, of frequencies
+
+f a =  [[if x >= n then '*' else ' ' | x <- a] | n <- [9,8..1], n <= maximum a]
+    ++ ["==========\n0123456789"]
+
 -- Count the frequencies of each number and store in a list
 
 g a = [c n a | n <- [0..9]]
@@ -68,12 +73,4 @@ g a = [c n a | n <- [0..9]]
 -- then count the length of the remaining list
 
 c n = length . filter (==n)
-
--- Draw histogram using a list, a, of frequencies
-
-f a =  [r n a | n <- [9,8..1], n <= maximum a] ++ ["==========\n0123456789"]
-
--- Draw row n of the histogram, using list, a, of frequencies
-
-r n a = [if x >= n then '*' else ' ' | x <- a]
 
