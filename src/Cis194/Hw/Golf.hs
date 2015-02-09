@@ -1,4 +1,5 @@
 module Cis194.Hw.Golf where
+import Data.List
 
 sks :: Int -> Int -> [a] -> [a]
 sks _ _ [] = []
@@ -18,5 +19,21 @@ localMaxima (x:r@(y:z:zz))
             | (y > x) && (y > z) = y:(localMaxima r)
             | otherwise = localMaxima r
 
-histogram :: [Integer] -> String
-histogram _ = ""
+push :: Integer -> [Char]
+push 1 = "*"
+push x = (" ":push (x - 1))
+
+punch :: [Integer] -> [String] -> [String]
+punch (x:xs) z
+    | length z == 9 = z
+    | x > 0 = punch xs (z:(push (x - (length z))))
+
+his :: [Integer] -> Integer -> [Integer]
+his x y = (filter (\i -> i == y) x)
+
+histogram :: [Integer] -> [[Integer]]
+histogram x = let z = "==========\n0123456789\n"
+                      -- y = [1..9]
+              in
+              (map (\i -> his x i) [1..9])
+              
