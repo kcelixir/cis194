@@ -1,12 +1,23 @@
 {-# OPTIONS_GHC -Wall #-}
-module Cis194.Hw.LogAnalysis where
+module LogAnalysis where
 
 -- in ghci, you may need to specify an additional include path:
 -- Prelude> :set -isrc/Cis194/Hw
-import  Cis194.Hw.Log
+import Log
+
+second :: String -> String
+second s = (head (drop 1 (words s)))
+
+makeTimestamp :: String -> Int
+makeTimestamp s
+    | head s == "E" = (read (head (drop 2 s)) :: Int)
+
+makeErrorSev :: String -> Int
+makeErrorSev s = (read (second s) :: Int)
 
 parseMessage :: String -> LogMessage
-parseMessage s = Unknown s
+parseMessage x@(t:s)
+    | head s == "E" = LogMessage Error (makeErrorSev s)
 
 parse :: String -> [LogMessage]
 parse _ = []
