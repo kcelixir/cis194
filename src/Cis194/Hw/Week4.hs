@@ -45,8 +45,7 @@ xor :: [Bool] -> Bool
 xor = foldl (/=) False
 
 map' :: (a -> b) -> [a] -> [b]
-map' f a = foldr ((:).f) [] a
-map'' f a = foldl (\x y -> x ++ [f y]) [] a
+map' f = foldr ((:).f) []
 
 -- Exercise 4 --
 sieveSundaram :: Integer -> [Integer]
