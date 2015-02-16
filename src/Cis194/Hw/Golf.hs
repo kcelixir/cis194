@@ -30,7 +30,7 @@ rows :: [Int] -> String
 rows lst = concatMap(\x -> (buildRow x f)) (reverse [1..m])
   where
     f = frequencies lst
-    m = maxRow (frequencies lst)
+    m = maxRow f
 
 frequencies :: [Int] -> [(Int, Int)]
 frequencies lst = map (\x -> (x, (length (filter (==x) lst)))) [0..9]
