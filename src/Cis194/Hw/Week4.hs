@@ -38,10 +38,10 @@ foldTree = foldr insert Leaf
     depth Leaf = 0
 
 xor :: [Bool] -> Bool
-xor _ = False
+xor = foldr (/=) False . filter id
 
 map' :: (a -> b) -> [a] -> [b]
-map' _ _ = []
+map' f = foldr (\ x l -> (f x) : l) []
 
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram _ = []
