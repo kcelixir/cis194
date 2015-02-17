@@ -7,7 +7,7 @@ fun1 (x:xs)
   | otherwise = fun1 xs
 
 fun1' :: [Integer] -> Integer
-fun1' _ = 0
+fun1' = foldr (*) 1 . map (subtract 2) . filter even
 
 fun2 :: Integer -> Integer
 fun2 1 = 0
@@ -15,7 +15,7 @@ fun2 n | even n = n + fun2 (n `div` 2)
   | otherwise = fun2 (3 * n + 1)
 
 fun2' :: Integer -> Integer
-fun2' _ = 0
+fun2' = sum . filter even . takeWhile (> 1) . iterate (\n -> if even n then n `div` 2 else 3*n+1)
 
 data Tree a = Leaf
   | Node Integer (Tree a) a (Tree a)
