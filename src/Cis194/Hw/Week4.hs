@@ -27,19 +27,16 @@ data Tree a = Leaf
   deriving (Show, Eq)
 
 foldTree :: [a] -> Tree a
-foldTree a = foldr addTree Leaf a
-
-addTree :: a -> Tree a -> Tree a
-addTree x Leaf = Node 0 Leaf x Leaf
-addTree x (Node _ l y r) = Node nh nl y nr
-  where
-    (nl,nr) | (h l) < (h r) = ((addTree x l), r)
-            | otherwise     = (l, (addTree x r))
-    nh = (max (h nl) (h nr)) + 1
-
---height
-h Leaf = -1
-h (Node x _ _ _) = x
+foldTree = foldr treeCons Leaf
+  where 
+    treeCons x Leaf = Node 0 Leaf x Leaf
+    treeCons x (Node _ l y r) = Node nh nl y nr
+      where
+        (nl,nr) | (h l) < (h r) = ((treeCons x l), r)
+                | otherwise     = (l, (treeCons x r))
+        nh = (max (h nl) (h nr)) + 1
+        h Leaf = -1
+        h (Node x _ _ _) = x
 
 -- Exercise 3 --
 
