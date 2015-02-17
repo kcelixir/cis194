@@ -44,4 +44,5 @@ map' :: (a -> b) -> [a] -> [b]
 map' f = foldr (\ x l -> (f x) : l) []
 
 sieveSundaram :: Integer -> [Integer]
-sieveSundaram _ = []
+sieveSundaram n = [2*x + 1 | x <- [1..n], not (elem x witnesses)]
+  where witnesses = [i + j + 2*i*j | j <-[1..n], i <- [1..j]]
