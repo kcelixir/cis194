@@ -16,14 +16,9 @@ fun2 n
   | otherwise = fun2 (3 * n + 1)
 
 fun2' :: Integer -> Integer
-fun2' x = sum (iterate op x)
+fun2' = sum . filter even . takeWhile (>1) . iterate op
   where
-    op n =
-      if even n
-      then
-        n `div` 2
-      else
-        3 * n + 1
+    op n = if even n then n `div` 2 else 3 * n + 1
 
 data Tree a = Leaf
   | Node Integer (Tree a) a (Tree a)
@@ -33,7 +28,7 @@ foldTree :: [a] -> Tree a
 foldTree xs = Leaf
 
 xor :: [Bool] -> Bool
-xor = foldl (\res x -> if x == True then not res else res) False
+xor = foldl (/=) False
 
 map' :: (a -> b) -> [a] -> [b]
 map' f xs = foldr (\x acc -> f x : acc) []  xs
