@@ -30,13 +30,13 @@ foldTree :: [a] -> Tree a
 foldTree = foldr treeCons Leaf
   where 
     treeCons x Leaf = Node 0 Leaf x Leaf
-    treeCons x (Node _ l y r) = Node nh nl y nr
+    treeCons x (Node _ l y r) = Node h' l' y r'
       where
-        (nl,nr) | (h l) < (h r) = ((treeCons x l), r)
-                | otherwise     = (l, (treeCons x r))
-        nh = (max (h nl) (h nr)) + 1
-        h Leaf = -1
         h (Node x _ _ _) = x
+        h Leaf = -1
+        (l',r') | (h l) < (h r) = ((treeCons x l), r)
+                | otherwise     = (l, (treeCons x r))
+        h' = (max (h l') (h r')) + 1
 
 -- Exercise 3 --
 
