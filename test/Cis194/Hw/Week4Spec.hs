@@ -42,9 +42,7 @@ spec = do
       myFoldl (flip (:)) "" "ABC" `shouldBe` foldl (flip (:)) "" "ABC"
 
   describe "sieveSundaram" $ do
-    it "returns no primes for n < 2" $ do
-      sieveSundaram (-1) `shouldBe` []
-      sieveSundaram 1 `shouldBe` []
-
     it "computes all primes between 2 and 2n+1, inclusive" $ do
       sieveSundaram 10 `shouldBe` [2,3,5,7,11,13,17,19]
+      sieveSundaram 0 `shouldBe` [2]
+      sieveSundaram 1 `shouldBe` [2,3]

@@ -46,14 +46,12 @@ xor = foldl (/=) False
 
 map' :: (a -> b) -> [a] -> [b]
 map' f = foldr ((:).f) []
--- map' f a = foldl (\x y -> x ++ [f y]) [] a
 
 myFoldl :: (a -> b -> a) -> a -> [b] -> a
 myFoldl f base xs = foldr (flip f) base (reverse xs)
 
 -- Exercise 4 --
 sieveSundaram :: Integer -> [Integer]
-sieveSundaram _ = []
+sieveSundaram n = 2:[2*x+1 | x<-[1..n], notElem x s]
+    where s = [i+j+2*i*j | j <-[1..n], i<-[1..j]]
 
-cartProd :: [a] -> [b] -> [(a, b)]
-cartProd xs ys = [(x,y) | x <- xs, y <- ys]
