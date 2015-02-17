@@ -31,13 +31,15 @@ foldTree a = foldr addTree Leaf a
 
 addTree :: a -> Tree a -> Tree a
 addTree x Leaf = Node 0 Leaf x Leaf
-addTree x (Node h l y r) = Node nh nl y nr
+addTree x (Node _ l y r) = Node nh nl y nr
   where
-    nh = (max (height nl) (height nr)) + 1
-    (nl,nr) = if hl < hr then ((addTree x l),r) else (l,(addTree x r))
-    (hl,hr) = (height l, height r)
-    height Leaf = -1
-    height (Node n _ _ _) = n
+    (nl,nr) | (h l) < (h r) = ((addTree x l), r)
+            | otherwise     = (l, (addTree x r))
+    nh = (max (h nl) (h nr)) + 1
+
+--height
+h Leaf = -1
+h (Node x _ _ _) = x
 
 -- Exercise 3 --
 
@@ -51,6 +53,7 @@ myFoldl :: (a -> b -> a) -> a -> [b] -> a
 myFoldl f base xs = foldr (flip f) base (reverse xs)
 
 -- Exercise 4 --
+
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram n = 2:[2*x+1 | x<-[1..n], notElem x s]
     where s = [i+j+2*i*j | j <-[1..n], i<-[1..j]]
