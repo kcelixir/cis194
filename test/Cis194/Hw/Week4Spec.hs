@@ -19,9 +19,8 @@ spec = do
       fun2 2 `shouldBe` fun2' 2
       fun2 3 `shouldBe` fun2' 3
 
-  describe "addTree'" $ do
-    it "should add items to a tree" $ do
-      addTree 'A' Leaf `shouldBe` Node 0 Leaf 'A' Leaf
+  describe "foldTree'" $ do
+    it "should place items in a list into a balanced tree" $ do
       foldTree "AB" `shouldBe` Node 1 Leaf 'B'(Node 0 Leaf 'A' Leaf)
       foldTree "ABC" `shouldBe` Node 1 (Node 0 Leaf 'A' Leaf) 'C' (Node 0 Leaf 'B' Leaf)
       foldTree "ABCDEFGHIJ" `shouldBe` Node 3 (Node 2 (Node 0 Leaf 'C' Leaf) 'H' (Node 1 Leaf 'F' (Node 0 Leaf 'B' Leaf))) 'J' (Node 2 (Node 1 Leaf 'E' (Node 0 Leaf 'A' Leaf)) 'I' (Node 1 Leaf 'G' (Node 0 Leaf 'D' Leaf)))
