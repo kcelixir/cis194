@@ -70,3 +70,10 @@ spec = do
     it "should perform addition and multiplication modulo 7" $ do
       (add (lit 6) (lit 9)) `shouldBe` (Mod7 1)
       (mul (lit 4) (lit 10)) `shouldBe` (Mod7 5)
+
+  describe "testExpr" $ do
+    it "evaluate testExp correctly" $ do
+      testInteger `shouldBe` Just (-7)
+      testBool `shouldBe` Just True
+      testMM `shouldBe` Just (MinMax 5)
+      testSat `shouldBe` Just (Mod7 0)

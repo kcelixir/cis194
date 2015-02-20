@@ -3,13 +3,19 @@ module Cis194.Hw.Calc where
 import  Cis194.Hw.ExprT
 import  Cis194.Hw.Parser
 
+-- Exercise 1 --
+
 eval :: ExprT -> Integer
 eval (Lit x) = x
 eval (Mul x y) = (eval x) * (eval y)
 eval (Add x y) = (eval x) + (eval y)
 
+-- Exercise 2 --
+
 evalStr :: String -> Maybe Integer
 evalStr s = parseExp id (+) (*) s
+
+-- Exercise 3 --
 
 class Expr a where
   lit :: Integer -> a
@@ -20,6 +26,8 @@ instance Expr ExprT where
   lit x = (Lit x)
   mul x y = (Mul x y)
   add x y = (Add x y)
+
+-- Exercise 4 --
 
 instance Expr Integer where
   lit x = x
@@ -43,3 +51,13 @@ instance Expr Mod7 where
   
 newtype MinMax  = MinMax Integer deriving (Eq, Show)
 newtype Mod7    = Mod7 Integer deriving (Eq, Show)
+
+testExp :: Expr a => Maybe a
+testExp = parseExp lit add mul "(3 * -4) + 5"
+
+testInteger  = testExp :: Maybe Integer
+testBool     = testExp :: Maybe Bool
+testMM       = testExp :: Maybe MinMax
+testSat      = testExp :: Maybe Mod7
+
+-- Exercise 5 --
