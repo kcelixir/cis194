@@ -3,6 +3,7 @@ module Cis194.Hw.CalcSpec (main, spec) where
 import Test.Hspec
 import Cis194.Hw.Calc
 import Cis194.Hw.ExprT
+import qualified Cis194.Hw.StackVM as Stk
 
 main :: IO ()
 main = hspec spec
@@ -72,8 +73,12 @@ spec = do
       (mul (lit 4) (lit 10)) `shouldBe` (Mod7 5)
 
   describe "testExpr" $ do
-    it "evaluate testExp correctly" $ do
+    it "evaluate testExp correctly for different types" $ do
       testInteger `shouldBe` Just (-7)
       testBool `shouldBe` Just True
       testMM `shouldBe` Just (MinMax 5)
       testSat `shouldBe` Just (Mod7 0)
+
+  describe "compile" $ do
+    it "should comiple an expression into a stack" $ do
+      testVal `shouldBe` 20

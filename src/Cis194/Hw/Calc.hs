@@ -63,3 +63,49 @@ testSat      = testExp :: Maybe Mod7
 
 -- Exercise 5 --
 
+instance Expr Stk.Program where
+  lit x = [Stk.PushI x] 
+  mul x y = x ++ y ++ [Stk.Mul]
+  add x y = x ++ y ++ [Stk.Add]
+
+compile :: String -> Maybe Stk.Program
+compile = parseExp lit add mul
+
+-- Test:
+testProgram = compile "(7+3)*2"
+runStack (Just p) = Stk.stackVM p
+parseVal (Right (Stk.IVal x)) = x
+testVal = parseVal $ runStack testProgram
+
+{-
+class ExprS a where
+  slit :: Integer -> Stk.Progam
+  smul, sadd :: a -> a -> a
+
+instance ExprS ExprT where
+  slit = Lit
+  smul = Mul
+  sadd = Add
+
+instance ExprS Integer where
+  slit = Stk.PushI
+  smul = Stk.And
+  sadd = Stk.Or
+
+instance ExprS Bool where
+  slit = [Stk.PushB]
+  smul x y = Stk.And
+  sadd = Stk.Or
+
+seval :: ExprS -> Stk.Program
+seval (Lit (Integer x)) = [Stk.PushI x]
+seval (Lit (Bool x)) = [Stk.PushB x]
+seval (Mul x y) = (seval x) ++ (seval y) ++ [Stk.Mul]
+seval (Add x y) = (seval x) ++ (seval y) ++ [Stk.Add]
+seval (And x y) = (seval x) ++ (seval y) ++ [Stk.And]
+seval (Or  x y) = (seval x) ++ (seval y) ++ [Stk.Or]
+seval _ = []
+
+compile :: String -> Maybe Program
+compile = (seval (parseExp slit sadd smul)) 
+-}
