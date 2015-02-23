@@ -1,7 +1,9 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Cis194.Hw.Calc where 
 
 import  Cis194.Hw.ExprT
 import  Cis194.Hw.Parser
+import qualified Cis194.Hw.StackVM as Stk
 
 -- Exercise 1 --
 
@@ -19,8 +21,7 @@ evalStr = parseExp id (+) (*)
 
 class Expr a where
   lit :: Integer -> a
-  mul :: a -> a -> a
-  add :: a -> a -> a
+  mul, add :: a -> a -> a
 
 instance Expr ExprT where
   lit = Lit
@@ -30,7 +31,7 @@ instance Expr ExprT where
 -- Exercise 4 --
 
 instance Expr Integer where
-  lit x = x
+  lit = id
   mul = (*)
   add = (+)
   
@@ -41,13 +42,13 @@ instance Expr Bool where
   
 instance Expr MinMax where
   lit = MinMax
-  mul (MinMax x) (MinMax y) = (MinMax (min x y))
-  add (MinMax x) (MinMax y) = (MinMax (max x y))
+  mul (MinMax x) (MinMax y) = MinMax $ min x y
+  add (MinMax x) (MinMax y) = MinMax $ max x y
   
 instance Expr Mod7 where
   lit = Mod7 . flip mod 7
-  mul (Mod7 x) (Mod7 y) = Mod7 (mod (x*y) 7)
-  add (Mod7 x) (Mod7 y) = Mod7 (mod (x+y) 7)
+  mul (Mod7 x) (Mod7 y) = Mod7 $ mod (x*y) 7
+  add (Mod7 x) (Mod7 y) = Mod7 $ mod (x+y) 7
   
 newtype MinMax  = MinMax Integer deriving (Eq, Show)
 newtype Mod7    = Mod7 Integer deriving (Eq, Show)
@@ -61,3 +62,4 @@ testMM       = testExp :: Maybe MinMax
 testSat      = testExp :: Maybe Mod7
 
 -- Exercise 5 --
+
