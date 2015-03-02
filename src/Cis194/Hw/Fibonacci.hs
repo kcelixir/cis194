@@ -57,9 +57,8 @@ fibs2 = 1 : fibs2' 1 1 where
 
 data Stream a = Stream a (Stream a)
 
-instance Show a => Show (Stream a)
-  where
-    show s = showStream 20 s
+instance Show a => Show (Stream a) where
+  show s = showStream 20 s
 
 showStream :: Show a => Int -> Stream a -> String
 showStream 0 _ = []
@@ -148,3 +147,22 @@ instance Fractional (Stream Integer) where
 
 fibs3 :: Stream Integer
 fibs3 = x / (1 - x - x^2)
+
+----------
+-- Ex 7 --
+----------
+
+data Matrix = Matrix Integer Integer Integer Integer
+
+instance Show (Matrix) where
+  show (Matrix a b c d) = "[ " ++ (show a) ++ " " ++ (show b) ++ "\n  " ++ (show c) ++ " " ++ (show d) ++ " ]"
+
+
+instance Num (Matrix) where
+  (*) (Matrix a b c d) (Matrix e f g h) = Matrix (a*e+b*g) (a*f+b*h) (c*e+d*g) (c*f+d*h)
+
+fib4 :: Integer -> Integer
+fib4 0 = 0
+fib4 1 = 1
+fib4 n = case (Matrix 1 1 1 0) ^ (n-1) of
+  Matrix a b c d -> a
