@@ -1,4 +1,6 @@
+{-# LANGUAGE ParallelListComp #-}
 module Cis194.Hw.Fibonacci where
+import Data.List
 
 ----------
 -- Ex 1 --
@@ -6,17 +8,16 @@ module Cis194.Hw.Fibonacci where
 
 -- Translate the above definition of Fibonacci numbers directly into a
 -- recursive function definition of type:
---
+
 fib :: Integer -> Integer
-fib _ = 0
---
+fib x | (x<2) = x
+      | otherwise = fib (x-1) + fib (x-2)
+
 -- so that fib n computes the nth Fibonacci number Fn. Then, use fib to
 -- define the infinite list of all Fibonacci numbers:
---
--- fibs1 :: [Integer]
 
 fibs1 :: [Integer]
-fibs1 = []
+fibs1 = [fib x | x <-[0..]]
 
 ----------
 -- Ex 2 --
@@ -29,18 +30,35 @@ fibs1 = []
 -- so that it has the same elements as fibs, but computing the first n
 -- elements of fibs2 requires only O(n) addition operations. Be sure to
 -- use standard recursion pattern(s) from Prelude, as appropriate.
---
 
+fibs2 :: [Integer]
+fibs2 = 0:1:[ a+b | a <- fibs2 | b <- (tail fibs2)]
+
+-- I originally thought this should work:
+-- fibs2 = foldl' f [0,1] [1..]
+--   where f a n = a ++ [a!!n + a!!(n-1)]
+
+-- Found this cool solution on the webz:
+-- fibs2 = 0:1:zipWith (+) fibs2 (tail fibs2)
+
+-- Another:
+-- fibs2 = 0:scanl (+) 1 fibs2
 
 ----------
 -- Ex 3 --
 ----------
 
 -- * Define a data type of polymorphic streams, Stream.
+
+data Stream a = Stream a (Stream a)
+ 
 -- * Write a function to convert a Stream to an infinite list:
 --
 --   streamToList :: Stream a -> [a]
 --
+streamToList :: Stream a -> [a]
+streamToList (Stream x xs) = x : streamToList xs
+
 -- * Make your own instance of Show for Stream:
 --
 --   instance Show a => Show (Stream a) where
@@ -48,6 +66,9 @@ fibs1 = []
 --
 --   ...which works by showing only some prefix of a stream (say, the first
 --   20 elements)
+
+instance Show a => Show (Stream a) where
+  show = show . take 20 . streamToList
 
 ----------
 -- Ex 4 --
@@ -59,13 +80,19 @@ fibs1 = []
 --
 -- ...which generates a stream containing infinitely many copies of the
 -- given element
---
+
+streamRepeat :: a -> Stream a
+streamRepeat x = Stream x $ streamRepeat x
+
 -- * Write a function:
 --
 -- streamMap :: (a -> b) -> Stream a -> Stream b
 --
 -- ...which applies a function to every element of a Stream
---
+
+streamMap :: (a -> b) -> Stream a -> Stream b
+streamMap f (Stream x xs) = Stream (f x) (streamMap f xs)
+
 -- * Write a function:
 --
 -- streamFromSeed :: (a -> a) -> a -> Stream a
@@ -74,6 +101,9 @@ fibs1 = []
 -- element of the stream, and an “unfolding rule” of type a -> a which
 -- specifies how to transform the seed into a new seed, to be used for
 -- generating the rest of the stream.
+
+streamFromSeed :: (a -> a) -> a -> Stream a
+streamFromSeed f s = Stream s $ streamFromSeed f $ f s
 
 ----------
 -- Ex 5 --
@@ -84,7 +114,10 @@ fibs1 = []
 -- nats :: Stream Integer
 --
 -- ...which contains the infinite list of natural numbers 0, 1, 2...
---
+
+nats :: Stream Integer
+nats = streamFromSeed (+1) 0
+
 -- * Define the stream:
 --
 -- ruler :: Stream Integer
@@ -99,3 +132,29 @@ fibs1 = []
 -- Hint: define a function interleaveStreams which alternates the
 -- elements from two streams. Can you use this function to implement ruler
 -- in a clever way that does not have to do any divisibility testing?
+interleaveStreams :: Stream a -> Stream a -> Stream a
+interleaveStreams (Stream a as) (Stream b bs) =
+  Stream a $ Stream b $ interleaveStreams as bs
+ 
+streamTail :: Stream a -> Stream a
+streamTail (Stream x xs) = xs
+
+ruler :: Stream Integer
+ruler = Stream 0 $ interleaveStreams (streamFromSeed (+1) 1) ruler
+
+
+-- The exponent of the largest power of 2 which divides a given number 2n.
+      
+-- First try (finishes in infinite time):
+-- ruler = f 0
+--     where f n = interleaveStreams (streamRepeat n) (f $ n+1)
+
+-- List ruler:
+-- ruler n = foldl' (\a x -> a++[x]++a) [1] [2..n]
+-- Another: 
+-- r n = if n == 1 then [1] else (r (n-1))++[n]++(r (n-1))
+-- Another:
+-- r n = foldr everyOther [] [0..n]
+--   where everyOther n a = foldr (\x y -> n:x:y) [n] a
+
+-- r (Stream n xs) = interleaveStreams (r (n-1)) (Stream n xs)
