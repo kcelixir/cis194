@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
 module Cis194.Hw.Fibonacci where
 
 ----------
@@ -8,7 +10,9 @@ module Cis194.Hw.Fibonacci where
 -- recursive function definition of type:
 --
 fib :: Integer -> Integer
-fib _ = 0
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n-1) + fib (n-2)
 --
 -- so that fib n computes the nth Fibonacci number Fn. Then, use fib to
 -- define the infinite list of all Fibonacci numbers:
@@ -16,7 +20,7 @@ fib _ = 0
 -- fibs1 :: [Integer]
 
 fibs1 :: [Integer]
-fibs1 = []
+fibs1 = map fib [1..]
 
 ----------
 -- Ex 2 --
@@ -30,7 +34,9 @@ fibs1 = []
 -- elements of fibs2 requires only O(n) addition operations. Be sure to
 -- use standard recursion pattern(s) from Prelude, as appropriate.
 --
-
+fibs2 :: [Integer]
+fibs2 = 1 : fibs2' 1 1 where
+  fibs2' x y = y : fibs2' y (x+y)
 
 ----------
 -- Ex 3 --
@@ -49,6 +55,20 @@ fibs1 = []
 --   ...which works by showing only some prefix of a stream (say, the first
 --   20 elements)
 
+data Stream a = Stream a (Stream a)
+
+instance Show a => Show (Stream a)
+  where
+    show s = showStream 20 s
+
+showStream :: Show a => Int -> Stream a -> String
+showStream 0 _ = []
+showStream 1 (Stream x _) = show x
+showStream n (Stream x xs) = (show x) ++ "," ++ showStream (n-1) xs
+
+streamToList :: Stream a -> [a]
+streamToList (Stream x xs) = x : streamToList xs
+
 ----------
 -- Ex 4 --
 ----------
@@ -59,13 +79,19 @@ fibs1 = []
 --
 -- ...which generates a stream containing infinitely many copies of the
 -- given element
---
+
+streamRepeat :: a -> Stream a
+streamRepeat x = Stream x $ streamRepeat x
+
 -- * Write a function:
 --
 -- streamMap :: (a -> b) -> Stream a -> Stream b
 --
 -- ...which applies a function to every element of a Stream
---
+
+streamMap :: (a -> b) -> Stream a -> Stream b
+streamMap f (Stream x xs) = Stream (f x) (streamMap f xs)
+
 -- * Write a function:
 --
 -- streamFromSeed :: (a -> a) -> a -> Stream a
@@ -74,6 +100,9 @@ fibs1 = []
 -- element of the stream, and an “unfolding rule” of type a -> a which
 -- specifies how to transform the seed into a new seed, to be used for
 -- generating the rest of the stream.
+
+streamFromSeed :: (a -> a) -> a -> Stream a
+streamFromSeed f x = Stream x $ streamFromSeed f (f x)
 
 ----------
 -- Ex 5 --
@@ -99,3 +128,23 @@ fibs1 = []
 -- Hint: define a function interleaveStreams which alternates the
 -- elements from two streams. Can you use this function to implement ruler
 -- in a clever way that does not have to do any divisibility testing?
+
+----------
+-- Ex 6 --
+----------
+
+x :: Stream Integer
+x = Stream 0 $ Stream 1 $ streamRepeat 0
+
+instance Num (Stream Integer) where
+  fromInteger n = Stream n $ streamRepeat 0
+  (+) (Stream a as) (Stream b bs) = Stream (a+b) (as + bs)
+  negate (Stream a as) = Stream (negate a) (negate as)
+  (*) (Stream a as) abs@(Stream b bs) = Stream (a*b) (streamMap (*a) bs + as*abs)
+
+instance Fractional (Stream Integer) where
+  (/) (Stream a as) (Stream b bs) | a == 0 && b == 0 = as / bs
+  (/) ast@(Stream a as) bst@(Stream b bs) = Stream (div a b) (streamMap (`div` b) (as - (ast/bst)*bs))
+
+fibs3 :: Stream Integer
+fibs3 = x / (1 - x - x^2)
