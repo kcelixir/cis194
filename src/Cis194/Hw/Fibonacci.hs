@@ -133,28 +133,8 @@ nats = streamFromSeed (+1) 0
 -- elements from two streams. Can you use this function to implement ruler
 -- in a clever way that does not have to do any divisibility testing?
 interleaveStreams :: Stream a -> Stream a -> Stream a
-interleaveStreams (Stream a as) (Stream b bs) =
-  Stream a $ Stream b $ interleaveStreams as bs
- 
-streamTail :: Stream a -> Stream a
-streamTail (Stream x xs) = xs
+interleaveStreams (Stream a as) bs = Stream a $ interleaveStreams bs as
 
 ruler :: Stream Integer
-ruler = Stream 0 $ interleaveStreams (streamFromSeed (+1) 1) ruler
-
-
--- The exponent of the largest power of 2 which divides a given number 2n.
-      
--- First try (finishes in infinite time):
--- ruler = f 0
---     where f n = interleaveStreams (streamRepeat n) (f $ n+1)
-
--- List ruler:
--- ruler n = foldl' (\a x -> a++[x]++a) [1] [2..n]
--- Another: 
--- r n = if n == 1 then [1] else (r (n-1))++[n]++(r (n-1))
--- Another:
--- r n = foldr everyOther [] [0..n]
---   where everyOther n a = foldr (\x y -> n:x:y) [n] a
-
--- r (Stream n xs) = interleaveStreams (r (n-1)) (Stream n xs)
+ruler = f 0
+  where f n = interleaveStreams (streamRepeat n) (f $ n+1)
