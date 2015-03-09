@@ -107,7 +107,7 @@ doCommand Edit = do
   modBuffer $ replaceLine l new
 
 doCommand (Load filename) = do
-  mstr <- io $ handle (\(_ :: IOException) -> 
+  mstr <- io $ handle (\(_ :: IOException) ->
                          putStrLn "File not found." >> return Nothing
                       ) $ do
                  h <- openFile filename ReadMode
@@ -136,11 +136,11 @@ doCommand Noop = return ()
 
 inBuffer :: Buffer b => Int -> Editor b Bool
 inBuffer n = do
-  nl <- onBuffer numLines
+  nl <- onBuffer (numLines, value)
   return (n >= 0 && n < nl)
 
 modCurLine :: Buffer b => (Int -> Int) -> Editor b ()
 modCurLine f = do
   l  <- getCurLine
-  nl <- onBuffer numLines
+  nl <- onBuffer (numLines, value)
   setCurLine . max 0 . min (nl - 1) $ f l

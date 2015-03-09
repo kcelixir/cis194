@@ -2,6 +2,7 @@ module JoinList where
 
 import Data.Monoid
 import Sized
+import Scrabble
 
 data JoinList m a = Empty
                    | Single m a
@@ -38,3 +39,11 @@ takeJ n jl | n <= 0 = Empty
 takeJ n jl | n >= listSize jl = jl
 takeJ n (Single s a) = Single s a
 takeJ n (Append _ l r) = takeJ n l +++ takeJ (n - listSize l) r
+
+scoreLine :: String -> JoinList Score String
+scoreLine s = Single (scoreString s) s
+
+serialize :: Monoid a => JoinList m a -> a
+serialize Empty = mempty
+serialize (Single _ a) = a
+serialize (Append _ l r) = serialize l <> serialize r
