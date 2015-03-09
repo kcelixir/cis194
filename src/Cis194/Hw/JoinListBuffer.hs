@@ -13,7 +13,11 @@ fromLine s = Single (scoreString s, Size 1) s
 
 instance Buffer (JoinList (Score, Size) String) where
   toString     = serialize
-  fromString   = foldr ((+++) . fromLine) Empty . lines
+  fromString   = appendList . lines where
+    appendList [] = Empty
+    appendList [s] = fromLine s
+    appendList l = (appendList (take (half l) l)) +++ (appendList (drop (half l) l))
+    half = (`div` 2) . length
   line         = indexJ
   replaceLine n l b = (takeJ n b) +++ fromLine l +++ (dropJ (n+1) b)
   numLines     = listSize

@@ -136,11 +136,11 @@ doCommand Noop = return ()
 
 inBuffer :: Buffer b => Int -> Editor b Bool
 inBuffer n = do
-  nl <- onBuffer (numLines, value)
+  nl <- onBuffer numLines
   return (n >= 0 && n < nl)
 
 modCurLine :: Buffer b => (Int -> Int) -> Editor b ()
 modCurLine f = do
   l  <- getCurLine
-  nl <- onBuffer (numLines, value)
+  nl <- onBuffer numLines
   setCurLine . max 0 . min (nl - 1) $ f l
