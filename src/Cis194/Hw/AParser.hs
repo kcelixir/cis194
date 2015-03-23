@@ -71,19 +71,25 @@ instance Functor Parser where
 -- and produces some value), then returns the result of applying the function to the
 -- value. However, if either p1 or p2 fails then the whole thing should also fail (put another
 -- way, p1 <*> p2 only succeeds if both p1 and p2 succeed).
-
+instance Applicative Parser where
+  pure x = Parser (\y -> Just (x, y))
+  p1 <*> p2 = Parser (\s1 -> runParser p1 s1 >>= \(f, s2) -> fmap (first f) (runParser p2 s2))
 
 -- Ex. 3a - Create a parser:
 --
 --   abParser :: Parser (Char, Char)
 --
 -- which expects to see the characters ’a’ and ’b’ and returns them as a pair
+abParser :: Parser (Char, Char)
+abParser = (,) <$> char 'a' <*> char 'b'
 
 -- Ex. 3b - Create a parser:
 --
 --   abParser_ :: Parser ()
 --
 -- which acts in the same way as abParser but returns () instead of 'a' and 'b'
+abParser_ :: Parser ()
+abParser_ = (\x y -> ()) <$> char 'a' <*> char 'b'
 
 -- Ex. 3c - Create a parser:
 --
@@ -91,6 +97,8 @@ instance Functor Parser where
 --
 -- which reads two integer values separated by a space and returns the integer
 -- values in a list. You should use the provided posInt to parse the integer values.
+intPair :: Parser [Integer]
+intPair = (\x _ y -> [x,y]) <$> posInt <*> char ' ' <*> posInt
 
 
 -- Ex. 4 - Write an Alternative instance for Parser
@@ -102,6 +110,9 @@ instance Functor Parser where
 -- ignored and the result of p1 is returned.  Otherwise, if p1 fails, then p2 is tried instead.
 --
 -- Hint: there is already an Alternative instance for Maybe which you may find useful.
+instance Alternative Parser where
+  empty = Parser (\_ -> Nothing)
+  (Parser p1) <|> (Parser p2) = Parser (\s -> (p1 s) <|> (p2 s))
 
 
 -- Ex. 5 - Implement a parser:
@@ -109,9 +120,5 @@ instance Functor Parser where
 --  intOrUppercase :: Parser ()
 --
 -- which parses either an integer value or an uppercase character, and fails otherwise.
-
-
-
-
-
-
+intOrUppercase :: Parser ()
+intOrUppercase = (const () <$> posInt) <|> (const () <$> satisfy isUpper)
