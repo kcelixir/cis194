@@ -8,6 +8,20 @@ import AParser
 import Data.Char
 import Control.Applicative
 
+-- An "identifier" is represented as just a String; however, only
+-- those Strings consisting of a letter followed by any number of
+-- letters and digits are valid identifiers.
+type Ident = String
+
+-- An "atom" is either an integer value or an identifier.
+data Atom = N Integer | I Ident
+  deriving Show
+
+-- An S-expression is either an atom, or a list of S-expressions.
+data SExpr = A Atom
+           | Comb [SExpr]
+  deriving Show
+
 -------------------------------------------------------------
 --  1. Parsing repetitions
 ------------------------------------------------------------
@@ -32,22 +46,14 @@ ident = (:) <$> satisfy isAlpha <*> many (satisfy isAlphaNum)
 --  3. Parsing S-expressions
 ------------------------------------------------------------
 
--- An "identifier" is represented as just a String; however, only
--- those Strings consisting of a letter followed by any number of
--- letters and digits are valid identifiers.
-type Ident = String
+parseSExpr :: Parser SExpr
+parseSExpr = spaces *> ( atom <|> sexp ) <* spaces
 
--- An "atom" is either an integer value or an identifier.
-data Atom = N Integer | I Ident
-  deriving Show
-
--- An S-expression is either an atom, or a list of S-expressions.
-data SExpr = A Atom
-           | Comb [SExpr]
-  deriving Show
-
-parseSExpr = spaces *> ( atom <|> sexp ) <* spaces where
-  atom = A <$> parseAtom
-  sexp = char '(' *> (Comb <$> some parseSExpr) <* char ')'
+atom = A <$> parseAtom
 
 parseAtom = N <$> posInt <|> I <$> ident
+
+sexp = Comb <$> (lParen *> zeroOrMore parseSExpr <* rParen) where
+  lParen = char '('
+  rParen = char ')'
+

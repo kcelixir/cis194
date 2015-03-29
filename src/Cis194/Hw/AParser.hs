@@ -1,4 +1,4 @@
-module Cis194.Hw.AParser where
+module AParser where
 
 import           Control.Applicative
 import           Data.Char
