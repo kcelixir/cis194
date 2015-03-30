@@ -17,14 +17,12 @@ import Data.Char
 
 oneOrMore :: Parser a -> Parser [a]
 oneOrMore = some
-{-oneOrMore p = (:) <$> p <*> zeroOrMore p-}
 
 -- To parse zero or more occurrences of p, try parsing one
 -- or more; if that fails, return the empty list.
 
 zeroOrMore :: Parser a -> Parser [a]
 zeroOrMore = many
-{-zeroOrMore p = oneOrMore p <|> pure []-}
 
 ------------------------------------------------------------
 --  2. Utilities
@@ -34,15 +32,18 @@ zeroOrMore = many
 -- more whitespace characters.
 
 spaces :: Parser String
-spaces = many $ char ' '
+spaces = zeroOrMore (satisfy isSpace)
 
 -- Next, ident should parse an identifier, which for our
 -- purposes will be an alphabetic character (use isAlpha)
 -- followed by zero or more alphanumeric characters (use
 -- isAlphaNum).
 
+(<:>) :: Applicative f => f a -> f [a] -> f [a]
+(<:>) = liftA2 (:)
+
 ident :: Parser String
-ident = (:) <$> (satisfy isAlpha) <*> many (satisfy isAlphaNum)
+ident = satisfy isAlpha <:> zeroOrMore (satisfy isAlphaNum)
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
@@ -61,3 +62,11 @@ data Atom = N Integer | I Ident
 data SExpr = A Atom
            | Comb [SExpr]
   deriving (Show, Eq)
+
+parseAtom :: Parser Atom
+parseAtom = N <$> posInt <|> I <$> ident
+
+parseSExpr :: Parser SExpr
+parseSExpr = spaces *> (atom <|> sexpr) <* spaces where
+    atom = A <$> parseAtom
+    sexpr = Comb <$> (char '(' *> zeroOrMore parseSExpr <* char ')')
