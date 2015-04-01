@@ -56,8 +56,11 @@ posInt = Parser f
 -- Ex. 1 - implement a Functor instance for Parser
 --
 -- You may find it useful to implement:
--- first :: (a -> b) -> (a,c) -> (b,c)
+first :: (a -> b) -> (a,c) -> (b,c)
+first f (x,y) = (f x,y)
 
+instance Functor Parser where
+  fmap f (Parser a) = Parser $ fmap (first f) . a
 
 -- Ex. 2 - implement an Applicative instance for Parser
 --
@@ -67,27 +70,33 @@ posInt = Parser f
 -- and produces some value), then returns the result of applying the function to the
 -- value. However, if either p1 or p2 fails then the whole thing should also fail (put another
 -- way, p1 <*> p2 only succeeds if both p1 and p2 succeed).
-
+instance Applicative Parser where
+  pure x = Parser (\y -> Just (x,y))
+  Parser p1 <*> Parser p2 = Parser (\s -> p1 s >>= next) where
+    next (f,s) = first f <$> p2 s
 
 -- Ex. 3a - Create a parser:
 --
 --   abParser :: Parser (Char, Char)
 --
 -- which expects to see the characters ’a’ and ’b’ and returns them as a pair
-
+abParser :: Parser (Char,Char)
+abParser = (,) <$> char 'a' <*> char 'b'
 -- Ex. 3b - Create a parser:
 --
 --   abParser_ :: Parser ()
 --
 -- which acts in the same way as abParser but returns () instead of 'a' and 'b'
-
+abParser_ :: Parser ()
+abParser_ = (const (const ())) <$> (char 'a') <*> (char 'b')
 -- Ex. 3c - Create a parser:
 --
 --   intPair 
 --
 -- which reads two integer values separated by a space and returns the integer 
 -- values in a list. You should use the provided posInt to parse the integer values.
-
+intPair :: Parser [Integer]
+intPair = (\a _ b -> [a,b]) <$> posInt <*> char ' ' <*> posInt
 
 -- Ex. 4 - Write an Alternative instance for Parser
 --
@@ -99,6 +108,9 @@ posInt = Parser f
 --
 -- Hint: there is already an Alternative instance for Maybe which you may find useful.
 
+instance Alternative Parser where
+  empty = Parser $ const Nothing
+  (Parser p1) <|> (Parser p2) = Parser (\s -> p1 s <|> p2 s)
 
 -- Ex. 5 - Implement a parser:
 --
@@ -106,8 +118,6 @@ posInt = Parser f
 -- 
 -- which parses either an integer value or an uppercase character, and fails otherwise.
 
-
-
-
-
+intOrUppercase :: Parser ()
+intOrUppercase = (const () <$> posInt) <|> (const () <$> satisfy isUpper)
 
