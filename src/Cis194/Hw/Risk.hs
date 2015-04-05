@@ -26,6 +26,7 @@ die = getRandom
 type Army = Int
 
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
+  deriving (Show)
 
 dice ::  Army -> Rand StdGen [DieValue]
 dice n = sequence (replicate n die)
@@ -42,5 +43,13 @@ attack b (dieA, dieD)
   | dieA > dieD = b {defenders = defenders b - 1}
   | otherwise   = b {attackers = attackers b - 1}
 
--- main :: IO ()
--- main = readFile "data/company.txt" >>= putStr . guestList . read
+-- Ex3 --
+invade :: Battlefield -> Rand StdGen Battlefield
+invade b
+  | attackers b < 2 || defenders b == 0 = return b
+  | otherwise = battle b >>= invade
+
+main :: IO ()
+main = do
+  res <- evalRandIO $ invade $ Battlefield 5 5
+  putStrLn (show res)
