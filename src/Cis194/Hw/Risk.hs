@@ -54,16 +54,11 @@ invade b@(Battlefield a d)
 -- Ex4 --
 successProb :: Battlefield -> Rand StdGen Double
 successProb b = do
-  inv <- invasions 1000 b
-  return $ (foldl successTab 0.0 inv)
-
-successTab :: Double -> Battlefield -> Double
-successTab p (Battlefield a d) = if d==0 then p + 0.001 else p
-
-invasions ::  Int -> Battlefield -> Rand StdGen [Battlefield]
-invasions n b = sequence $ replicate n $ invade b
+  invasions <- sequence $ replicate 10000 $ invade b
+  return $ foldl f 0.0 invasions where
+  f p r = if defenders r == 0 then p + 0.0001 else p
 
 main :: IO ()
 main = do
-  res <- evalRandIO $ successProb $ Battlefield 5 5
+  res <- evalRandIO $ successProb $ Battlefield 12 12
   putStrLn (show res)
