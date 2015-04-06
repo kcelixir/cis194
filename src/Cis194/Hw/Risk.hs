@@ -3,6 +3,7 @@
 module Cis194.Hw.Risk where
 
 import Control.Monad.Random
+import Data.List
 
 ------------------------------------------------------------
 -- Die values
@@ -29,16 +30,17 @@ data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
   deriving (Show)
 
 dice ::  Army -> Rand StdGen [DieValue]
-dice n = sequence (replicate n die)
+-- Rolls n dice
+dice n = sequence $ replicate n die
 
+-- Returns result of single pair of dice
+attack :: Battlefield -> (DieValue,DieValue) -> Battlefield
 battle :: Battlefield -> Rand StdGen Battlefield
 battle b = do
   diceA <- dice $ min 3 (attackers b - 1)
   diceD <- dice $ min 2 (defenders b)
-  return $ foldl attack b $ zip diceA diceD
+  return $ foldl attack b $ zip (sort diceA) (sort diceD)
 
--- Returns result of single pair of dice
-attack :: Battlefield -> (DieValue,DieValue) -> Battlefield
 attack b (dieA, dieD)
   | dieA > dieD = b {defenders = defenders b - 1}
   | otherwise   = b {attackers = attackers b - 1}
