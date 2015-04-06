@@ -60,7 +60,59 @@ successProb b = do
   return $ foldl f 0.0 invasions where
   f p r = if attackers r > 1 then p + (1/1000) else p
 
+type Prob = Double
+data Battle = Battle { a :: Army, d :: Army , p :: Prob}
+  deriving (Show)
+
+battleP :: Battle -> [Battle]
+battleP (Battle a d p)
+  | nDice == (3,2) = [Battle  a    (d-2) (2890/7776 * p),
+                      Battle (a-1) (d-1) (2611/7776 * p),
+                      Battle (a-2)  d    (2275/7776 * p)]
+  | nDice == (3,1) = [Battle  a    (d-1) ( 855/1296 * p),
+                      Battle (a-1)  d    ( 441/1296 * p)]
+  | nDice == (2,2) = [Battle  a    (d-2) ( 295/1296 * p),
+                      Battle (a-1) (d-1) ( 420/1296 * p),
+                      Battle (a-2)  d    ( 581/1296 * p)]
+  | nDice == (2,1) = [Battle  a    (d-1) (  125/216 * p),
+                      Battle (a-1)  d    (   91/216 * p)]
+  | nDice == (1,2) = [Battle  a    (d-1) (   55/216 * p),
+                      Battle (a-1)  d    (  161/216 * p)]
+  | nDice == (1,1) = [Battle  a    (d-1) (    15/36 * p),
+                      Battle (a-1)  d    (    21/36 * p)]
+  | otherwise      = [Battle a d 1]
+  where
+    nDice = ((min 3 (a - 1)), min 2 d)
+
+invadeP :: Battle -> [Battle]
+invadeP b@(Battle a d p)
+  | a < 2 || d == 0 = [b]
+  | otherwise = concat $ map invadeP $ battleP b
+
+exactSuccessProb :: Battlefield -> Double
+exactSuccessProb (Battlefield a d) = sum [p b | b <- wins]
+  where
+    wins = filter success $ invadeP $ Battle a d 1
+    success (Battle a d _) = (d==0)
+
 main :: IO ()
 main = do
-  res <- evalRandIO $ successProb $ Battlefield 12 12
+  putStr "Attackers: "
+  a <- readLn
+  putStr "Defenders: "
+  d <- readLn
+  res <- evalRandIO $ successProb $ Battlefield a d
+  putStr "Simulated: "
   putStrLn (show res)
+  putStr "Exact: "
+  putStrLn $ show $ exactSuccessProb $ Battlefield a d
+
+
+
+
+
+
+
+
+
+
