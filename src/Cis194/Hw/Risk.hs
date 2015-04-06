@@ -29,9 +29,11 @@ type Army = Int
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
   deriving (Show)
 
--- Rolls n dice
-dice ::  Army -> Rand StdGen [DieValue]
-dice n = sequence $ replicate n die
+-- Rolls n dice and sorts them in descending order
+dice ::  Int -> Rand StdGen [DieValue]
+dice n = do
+  d <- sequence $ replicate n die
+  return $ reverse $ sort $ d
 
 -- Returns result of single pair of dice
 attack :: Battlefield -> (DieValue,DieValue) -> Battlefield
@@ -43,7 +45,7 @@ battle :: Battlefield -> Rand StdGen Battlefield
 battle b = do
   diceA <- dice $ min 3 (attackers b - 1)
   diceD <- dice $ min 2 (defenders b)
-  return $ foldl attack b $ zip (sort diceA) (sort diceD)
+  return $ foldl attack b $ zip diceA diceD
 
 -- Ex3 --
 invade :: Battlefield -> Rand StdGen Battlefield
@@ -54,9 +56,9 @@ invade b@(Battlefield a d)
 -- Ex4 --
 successProb :: Battlefield -> Rand StdGen Double
 successProb b = do
-  invasions <- sequence $ replicate 10000 $ invade b
+  invasions <- sequence $ replicate 1000 $ invade b
   return $ foldl f 0.0 invasions where
-  f p r = if defenders r == 0 then p + 0.0001 else p
+  f p r = if attackers r > 1 then p + (1/1000) else p
 
 main :: IO ()
 main = do
