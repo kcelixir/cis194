@@ -8,17 +8,16 @@ http://www.seas.upenn.edu/~cis194/lectures.html
 
 On a mac:
 
-    brew install haskell-platform
+    brew install haskell-stack
+    stack setup
     cd cis194
-    cabal install hspec
-    cabal configure --enable-test
-    cabal build
-    cabal test
+    stack init
+    stack test
 
 ## How to run tests
 
 ```
-cabal configure --enable-tests && cabal build && cabal test
+stack test
 ```
 
 ## Using QuickCheck in ghci
