@@ -9,9 +9,8 @@ http://www.seas.upenn.edu/~cis194/lectures.html
 On a mac:
 
     brew install haskell-stack
-    stack setup
     cd cis194
-    stack init
+    stack setup
     stack test
 
 ## How to run tests
