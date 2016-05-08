@@ -1,7 +1,7 @@
 -- CIS 194 Homework 2
 module Cis194.Hw.Log where
 
-import Control.Applicative
+import Control.Applicative()
 
 data MessageType = Info
                  | Warning
@@ -35,4 +35,3 @@ testWhatWentWrong :: (String -> [LogMessage])
                   -> IO [String]
 testWhatWentWrong parse whatWentWrong file
   = whatWentWrong . parse <$> readFile file
-  

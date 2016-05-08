@@ -1,6 +1,6 @@
 module Cis194.Hw.AParser where
 
-import           Control.Applicative
+import           Control.Applicative()
 import           Data.Char
 
 -- A parser for a value of type a is a function which takes a String
@@ -58,16 +58,14 @@ posInt = Parser f
 -- You may find it useful to implement:
 -- first :: (a -> b) -> (a,c) -> (b,c)
 
-
 -- Ex. 2 - implement an Applicative instance for Parser
 --
 --  pure a represents the parser which consumes no input and successfully returns a result of a.
---  p1 <*> p2 represents the parser which ﬁrst runs p1 (which will consume some input and 
--- produce a function), then passes the remaining input to p2 (which consumes more input 
+--  p1 <*> p2 represents the parser which ﬁrst runs p1 (which will consume some input and
+-- produce a function), then passes the remaining input to p2 (which consumes more input
 -- and produces some value), then returns the result of applying the function to the
 -- value. However, if either p1 or p2 fails then the whole thing should also fail (put another
 -- way, p1 <*> p2 only succeeds if both p1 and p2 succeed).
-
 
 -- Ex. 3a - Create a parser:
 --
@@ -83,9 +81,9 @@ posInt = Parser f
 
 -- Ex. 3c - Create a parser:
 --
---   intPair 
+--   intPair
 --
--- which reads two integer values separated by a space and returns the integer 
+-- which reads two integer values separated by a space and returns the integer
 -- values in a list. You should use the provided posInt to parse the integer values.
 
 
@@ -103,11 +101,5 @@ posInt = Parser f
 -- Ex. 5 - Implement a parser:
 --
 --  intOrUppercase :: Parser ()
--- 
+--
 -- which parses either an integer value or an uppercase character, and fails otherwise.
-
-
-
-
-
-

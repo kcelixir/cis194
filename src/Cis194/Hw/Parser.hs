@@ -2,11 +2,12 @@
 -- dependency on hackage. Builds an explicit representation of the
 -- syntax tree to fold over using client-supplied semantics.
 module Cis194.Hw.Parser (parseExp) where
-  
+
 import Control.Applicative hiding (Const)
 import Control.Arrow
+import Control.Monad
 import Data.Char
-import Data.Monoid
+import Data.Monoid()
 import Data.List (foldl')
 
 -- Building block of a computation with some state of type @s@
@@ -32,7 +33,8 @@ instance Applicative (State s) where
 
 instance Alternative (State s) where
     empty = State $ const Nothing
-    State f <|> State g = State $ \s -> maybe (g s) Just (f s)
+    State f <|> State g = State $ \s -> mplus (f s) (g s)
+    -- State f <|> State g = State $ \s -> maybe (g s) Just (f s)
 
 -- A parser threads some 'String' state through a computation that
 -- produces some value of type @a@.
@@ -40,28 +42,29 @@ type Parser a = State String a
 
 -- Parse one numerical digit.
 digit :: Parser Integer
-digit = State $ parseDigit
+digit = State parseDigit
     where parseDigit [] = Nothing
-          parseDigit s@(c:cs)
+          parseDigit (c:cs)
               | isDigit c = Just (fromIntegral $ digitToInt c, cs)
               | otherwise = Nothing
 
 -- Parse an integer. The integer may be prefixed with a negative sign.
 num :: Parser Integer
-num = maybe id (const negate) <$> optional (char '-') <*> (toInteger <$> some digit)
-    where toInteger = foldl' ((+) . (* 10)) 0
+num = maybe id (const negate) <$> optional (char '-') <*> (toInt <$> some digit)
+    where toInt = foldl' ((+) . (* 10)) 0
 
 -- Parse a single white space character.
 space :: Parser ()
-space = State $ parseSpace
+space = State parseSpace
     where parseSpace [] = Nothing
-          parseSpace s@(c:cs)
+          parseSpace (c:cs)
               | isSpace c = Just ((), cs)
               | otherwise = Nothing
 
 -- Consume zero or more white space characters.
 eatSpace :: Parser ()
-eatSpace = const () <$> many space
+eatSpace = Control.Monad.void (many space)
+-- eatSpace = const () <$> many space
 
 -- Parse a specific character.
 char :: Char -> Parser Char
@@ -72,7 +75,7 @@ char c = State parseChar
 
 -- Parse one of our two supported operator symbols.
 op :: Parser (Expr -> Expr -> Expr)
-op = const Add <$> (char '+') <|> const Mul <$> (char '*')
+op = const Add <$> char '+' <|> const Mul <$> char '*'
 
 -- Succeed only if the end of the input has been reached.
 eof :: Parser ()
@@ -85,7 +88,7 @@ eof = State parseEof
 parseExpr :: Parser Expr
 parseExpr = eatSpace *>
             ((buildOp <$> nonOp <*> (eatSpace *> op) <*> parseExpr) <|> nonOp)
-    where buildOp x op y = x `op` y
+    where buildOp x op' y = x `op'` y
           nonOp = char '(' *> parseExpr <* char ')' <|> Const <$> num
 
 -- Run a parser over a 'String' returning the parsed value and the

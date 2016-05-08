@@ -42,7 +42,7 @@ spaces = many $ char ' '
 -- isAlphaNum).
 
 ident :: Parser String
-ident = (:) <$> (satisfy isAlpha) <*> many (satisfy isAlphaNum)
+ident = (:) <$> satisfy isAlpha <*> many satisfy isAlphaNum
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
