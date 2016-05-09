@@ -1,33 +1,24 @@
-module Cis194.Hw.Week1 where
+-- double every other digit (starting from right)
+-- sum the result for the entire sequence
+-- mod 10
+-- == 0
 
--------------
--- Ex 1-4  --
--------------
+:m +Test.QuickCheck
+:l src/Cis194/Hw/Week1.hs
 
-toDigits :: Integer -> [Integer]
-toDigits x = [x]
+let toDigits :: Integer -> [Integer]
+toDigits d = map (\x -> read x :: Integer) [(show d)]
 
-toDigitsRev :: Integer -> [Integer]
-toDigitsRev x = [x]
+let toDigitsRev :: Integer -> [Integer]
+toDigitsRev d = map (\x -> read x :: Integer) (reverse [(show d)])
 
-doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther xs = xs
+let doubleEveryOther :: [Integer] -> [Integer]
+doubleEveryOther []            = []
+doubleEveryOther (d1:d0:[])    = (d1 * 2)
+doubleEveryOther (ds:d1:d0:[]) = (d1 * 2) : doubleEveryOther ds
 
-sumDigits :: [Integer] -> Integer
-sumDigits _ = 0
+let sumDigits :: [Integer] -> Integer
+sumDigits d = sum d
 
-validate :: Integer -> Bool
-validate _ = False
-
----------------------
--- Towers of Hanoi --
----------------------
-
-type Peg = String
-type Move = (Peg, Peg)
-
-hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
-hanoi _ _ _ _ = []
-
-hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
-hanoi4 _ _ _ _ _ = []
+let validate :: Integer -> Bool
+validate x = (mod (sumDigits (doubleEveryOther (toDigits x)))) == 0
