@@ -5,19 +5,30 @@ module Cis194.Hw.Week1 where
 -------------
 
 toDigits :: Integer -> [Integer]
-toDigits x = [x]
+toDigits x
+  | x < 1 = []
+  | x < 10 = [x]
+  | otherwise = toDigits(x `div` 10) ++ [(x `mod` 10 ) ] 
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev x = [x]
+toDigitsRev x
+  | x < 1 = []
+  | x < 10 = [x]
+  | otherwise = (x `mod` 10) : toDigitsRev(x `div` 10)
 
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther xs = xs
+doubleEveryOther [] = []
+doubleEveryOther (x:[]) = [x]
+doubleEveryOther (x:y:zs) = x : ( y * 2 ) : doubleEveryOther zs
 
 sumDigits :: [Integer] -> Integer
-sumDigits _ = 0
+sumDigits [] = 0
+sumDigits (x:ys) = (x `mod` 10) + (x `div` 10) + sumDigits ys
 
 validate :: Integer -> Bool
-validate _ = False
+validate x
+  | sumDigits(doubleEveryOther(toDigitsRev x)) `mod` 10 == 0 = True
+  | otherwise = False
 
 ---------------------
 -- Towers of Hanoi --
