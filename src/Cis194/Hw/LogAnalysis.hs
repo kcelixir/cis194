@@ -5,8 +5,16 @@ module Cis194.Hw.LogAnalysis where
 -- Prelude> :set -isrc/Cis194/Hw
 import  Cis194.Hw.Log
 
+parseTimestamp :: String -> Int
+parseTimestamp (_:' ':i:' ':_) = read i
+
+parseErrorInt :: String -> Int
+parseErrorInt (_:i:' ':_) = read i
+
 parseMessage :: String -> LogMessage
-parseMessage s = Unknown s
+parseMessage s@('I':_) = Info (parseTimestamp s) s
+parseMessage s@('W':_) = Warning (parseTimestamp s) s
+parseMessage s@('E':_) = (Error (parseErrorInt s)) (parseTimestamp s) s
 
 parse :: String -> [LogMessage]
 parse _ = []
