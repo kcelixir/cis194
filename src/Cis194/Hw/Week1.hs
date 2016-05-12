@@ -44,6 +44,9 @@ hanoi n a b c = hanoi (n - 1) a c b ++ [(a, b)] ++ hanoi (n - 1 ) c b a
 hanoiK :: Integer -> Integer
 hanoiK n = (n - (floor (sqrt (( fromIntegral (2 * n)) + 1)))) + 1
 
+hanoiL :: Integer -> Integer
+hanoiL n = n - ((((round (sqrt (fromIntegral ((8 * n) + 1))))) - 1) `div` 2)
+
 hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
 hanoi4 0 _ _ _ _ = []
 hanoi4 1 a b _ _ = [(a, b)]

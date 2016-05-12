@@ -84,12 +84,12 @@ spec = do
     it "should solve for 2 discs" $ do
       (acceptHanoi4 hanoi4 2) `shouldBe` Just (HanoiState4 [] [1..2] [] [])
 
-    {-it "should solve for 5 discs" $ do
+    it "should solve for 5 discs" $ do
       (acceptHanoi4 hanoi4 5) `shouldBe` Just (HanoiState4 [] [1..5] [] [])
 
     it "should solve for 10 discs" $ do
       (acceptHanoi4 hanoi4 10) `shouldBe` Just (HanoiState4 [] [1..10] [] [])
 
-    it "should find an optimal solution for 15 disks" $ do
-      length (hanoi4 15 "a" "b" "c" "d") `shouldBe` 129
--}
+    {-it "should find an optimal solution for 15 disks" $ do
+      length (hanoi4 15 "a" "b" "c" "d") `shouldBe` 129 -}
+
