@@ -47,14 +47,14 @@ spec = do
       b `shouldBe` Node (Node Leaf baz Leaf) foo Leaf
       c `shouldBe` Node (Node Leaf baz Leaf) foo (Node Leaf bif Leaf)
 
-  describe "build" $ do
+{-  describe "build" $ do
     it "builds a MessageTree from a list of LogMessages" $ do
       let foo = LogMessage Warning 10 "foo"
       let baz = LogMessage Warning 5 "baz"
       let bif = LogMessage Warning 15 "bif"
 
       build [foo, baz, bif] `shouldBe` Node (Node Leaf baz Leaf) foo (Node Leaf bif Leaf)
-
+-}
   describe "inOrder" $ do
     it "will deconstruct the MessageTree into a list of LogMessages" $ do
       let foo = LogMessage Warning 10 "foo"
