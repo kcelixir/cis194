@@ -10,8 +10,8 @@ localMaxima :: [Integer] -> [Integer]
 localMaxima s = [b | (a, b, c) <- zip3 s (drop 1 s) (drop 2 s), a < b && b > c]
 
 histogram :: [Integer] -> String
-histogram l = unlines (transpose [ (concat (replicate (b - length (m !! i)) " ")) ++ concat (m !! i) ++ "=" ++ show i | i <- [0..9]])
-    where m = [["*" | x <-l, x == i]| i <- [0..9]]
+histogram l = unlines (transpose [concat ((replicate (b - length n) " ") ++ n) | n <- m])
+    where m = [["*" | x <-l, x == i] ++ ["=", show i]| i <- [0..9]]
           b = maximum (map length m)
 
 transpose :: [[a]] -> [[a]]
