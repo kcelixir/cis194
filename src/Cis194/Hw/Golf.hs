@@ -8,16 +8,11 @@ import Data.List
 --   from the source list
 --    ex: [1,2,3,4] -> [[1,2,3,4],[2,4],[3],[4]]
 -- . this list contains n elements, so iterate i from 1 to n
--- . iterate j over each multiple of i up to n, and use drop j-1 to skip
---   over i elements at a time, creating a list of sublists, each one
---   headed by the desired element
---    ex: [[[1,2,3,4],[2,3,4],[3,4],[4]],[[2,3,4],[4]],[[3,4]],[[4]]]
--- . take the heads of each sublist to select the correct output
+-- . iterate j over each multiple of i up to n, and extract the j-1th element
+--   from the list
 -----------------------------------------------------------------------------
 skips :: [a] -> [[a]]
-skips s = [map head h |
-           i <- [1..length s],
-           h <- [[drop (j - 1) s | j <- [i,i*2..length s]]]]
+skips s = [[s !! (j-1) | j <- [i,i*2..length s]] | i <- [1..length s]]
 
 -----------------------------------------------------------------------------
 -- local maxima
@@ -62,7 +57,7 @@ histogram :: [Integer] -> String
 histogram l = h l ++ "==========\n0123456789\n"
 
 
--- skipss=[mapheadh|i<-[1..lengths],h<-[[drop(j-1)s|j<-[i,i*2..lengths]]]]
+-- skipss=[[s!!(j-1)|j<-[i,i*2..lengths]]|i<-[1..lengths]]
 -- m(x,y,z)l|x<y&&y>z=y:l|True=llocalMaximas=foldrm[]$zip3s(drop1s)(drop2s)
 -- h[]=""hl=h(foldrdeletel[0..9])++[ifelemilthen'*'else''|i<-[0..9]]++"\n"histograml=hl++"==========\n0123456789\n"
--- 71+72+112=255
+-- 55+72+112=239
