@@ -1,21 +1,15 @@
 module Cis194.Hw.Golf where
 
-import Data.List
-
-nthItem :: Int -> [a] -> [a]
-nthItem n xs
-    | length xs < n = []
-    | otherwise = head (drop (n-1) xs) : nthItem n (drop n xs)
-
 skips :: [a] -> [[a]]
-skips xs = [nthItem x xs | x <- [1..(length xs)]]
+skips xs = [ [xs!!(x-1) | x <- [n,n*2..l]] | n <- [1..l] ]
+    where l = length xs
 
 maxima :: (Integer, Integer, Integer) -> [Integer]
-maxima (x,y,z) | (y > x && y > z) = [y]
+maxima (x,y,z) | y > x && y > z = [y]
                | otherwise = []
 
 part3 :: [Integer] -> [(Integer, Integer, Integer)]
-part3 xs = (zip3 xs (tail xs) (drop 2 xs))
+part3 xs = zip3 xs (tail xs) (drop 2 xs)
 
 localMaxima :: [Integer] -> [Integer]
 localMaxima xs = concatMap maxima (part3 xs)
@@ -29,11 +23,11 @@ draw n m
      | otherwise = ' '
 
 drawRow :: Int -> [Int] -> String
-drawRow m xs = map (\x -> (draw x m)) xs
+drawRow m = map (`draw` m)
 
 histogram :: [Integer] -> String
-histogram xs = unlines s ++ defStr
+histogram xs = unlines s ++ d
     where
-      defStr = "==========\n0123456789\n"
-      cs = counts xs
-      s = map (flip drawRow cs) $ reverse [1..(maximum cs)]
+      d = "==========\n0123456789\n"
+      c = counts xs
+      s = map (`drawRow` c) $ reverse [1..(maximum c)]
