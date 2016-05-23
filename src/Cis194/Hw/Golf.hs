@@ -5,21 +5,30 @@ import Data.List
 -- Exercise 1 --
 ----------------
 
+{-
 -- skips applies function s for every possible n and concats resulting lists
 
-skips :: [a] -> [[a]]
-skips l = [(s n l) | n <- [1..(length l)]]
+skips l = [s n l | n <- [1..length l]]
+-- or using map
+skips l = map (s l) [1..length l]
 
 -- s takes a list, l, and returns a new list with only every nth value
 
-s n l = [l !! (i-1) | i <- [n,2*n..(length l)]]
+s l n = [l !! (i-1) | i <- [n,2*n..length l]]
+-- or using map
+s l n = map (l !!) [n-1,2*n-1..(length l)-1]
 
-{- Function s can be shortened if we use chunk from the 'split' package:
+Function s can be shortened if we use chunk from the 'split' package:
 
 import Data.List.Split
 s n = map last . chunk n
 
 -}
+
+-- Finally, s can be combined with skips to save a few characters
+
+skips :: [a] -> [[a]]
+skips l = [[l !! (i-1) | i <- [n,2*n..length l]] | n <- [1..length l]]
 
 ----------------
 -- Exercise 2 --
@@ -46,7 +55,7 @@ localMaxima _ = []
 -}
 
 localMaxima :: [Integer] -> [Integer]
-localMaxima a = [y | (x:y:z:_) <- tails a, x < y && y > z]
+localMaxima a = [y | x:y:z:_ <- tails a, x < y && y > z]
 
 ----------------
 -- Exercise 3 --

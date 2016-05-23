@@ -1,0 +1,1 @@
+grep -ve :: -e -- -e ^$ -e import -e module src/Cis194/Hw/Golf.hs | tr '\n' ' ' | sed 's/ //g' | sed 's/{-[^}]*-}//g' | wc -m
