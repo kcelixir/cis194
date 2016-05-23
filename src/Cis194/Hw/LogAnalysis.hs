@@ -27,7 +27,7 @@ insert m t =
          Node l tm@(LogMessage _ ts _) r = t
 
 build :: [LogMessage] -> MessageTree
-build ms = foldr insert Leaf ms
+build = foldr insert Leaf
 
 inOrder :: MessageTree -> [LogMessage]
 inOrder Leaf         = []
@@ -38,4 +38,4 @@ inOrder (Node l m r) = inOrder l ++ [m] ++ inOrder r
 -- sorted by timestamp.
 whatWentWrong :: [LogMessage] -> [String]
 whatWentWrong ms =
-   [m | (LogMessage (Error s) _ m) <- (inOrder . build) ms, s >= 50]
+   [m | (LogMessage _ _ m) <- inOrder $ build ms]
