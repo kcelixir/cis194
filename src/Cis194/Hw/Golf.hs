@@ -8,14 +8,15 @@ import           Data.List
 -- input list zipped with its indices. The indices are modded against the
 -- element being mapped; only the elements at indices with a modulus of 0 are
 -- kept.
+n s = [1..length s]
 skips :: [a] -> [[a]]
-skips l = map (\x -> [i | (i, c) <- zip l [1..length l], mod c x == 0])  [1..length l]
+skips l = map (\x -> [i | (i, c) <- zip l $ n l, mod c x == 0])  $ n l
 
 -- localMaxima creates a sliding window over the input list, stores each
 -- window step as a list of triples, and uses a list comprehension to extract
 -- the second element of the triple if it meets the local maximum criteria.
 localMaxima :: [Integer] -> [Integer]
-localMaxima l = [y | (x,y,z) <- (\x -> zip3 x (drop 1 x) (drop 2 x)) l, y > x && y > z]
+localMaxima l = [y | (x,y,z) <- zip3 l (tail l) $ drop 2 l , y > x && y > z]
 
 -- histogram first sorts the input list, groups the elements to organize
 -- them into rows, then transposes those rows into columns, which leaves the
@@ -30,5 +31,5 @@ localMaxima l = [y | (x,y,z) <- (\x -> zip3 x (drop 1 x) (drop 2 x)) l, y > x &&
 -- are combined with 'unlines' to produce the final output.
 histogram :: [Integer] -> String
 histogram l = unlines (map (\x -> [if elem i x then '*' else ' ' | i <- [0..9]])
-  (reverse (transpose (group (sort l)))) ++
-  [take 10 ['=','='..], ['0'..'9']])
+  $ reverse $ transpose $ group $ sort l) ++
+  "==========\n0123456789"
