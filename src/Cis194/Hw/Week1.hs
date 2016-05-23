@@ -35,3 +35,21 @@ validate n
     let doubled = doubleEveryOther ds
     let summed = sumDigits doubled
     summed `mod` 10 == 0
+
+
+type Peg = String
+type Move = (Peg, Peg)
+hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
+hanoi n a b c
+  | n == 1 = (a, b)
+  | otherwise = do
+    let pegs = [1..n]
+    hanoiPegs a b c [pegs,[],[]]
+
+hanoiPegs :: Integer -> Peg -> Peg -> Peg -> [[Integer]] -> (Move, [[Integer]])
+hanoiPegs n a b c pegs
+  | n == last (pegs !! 0) = moveToTemp (head a) tail pegs
+
+
+-- a,b a,c b,c
+-- a,b a,c b,c a,b c,a
