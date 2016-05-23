@@ -1,5 +1,3 @@
-module Cis194.Hw.Golf where
-
 g = length
 
 skips s = map (\n -> [c | (c, i) <- zip s $ cycle [1..n], i == n]) [1..g s]
