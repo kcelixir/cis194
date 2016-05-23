@@ -2,17 +2,14 @@ module Cis194.Hw.Golf where
 
 import           Data.List
 
--- t stands for 'take every'. Given a list of a certain type and an integer,
--- it take every nth element and concatenates it with a recursive application
--- of take every on the list following that element.
-t :: [a] -> Int -> [a]
-t xs n
-  | n == 0 = xs
-  | n >= length xs = []
-  | True = xs !! n : t (drop (n+1) xs) n
-
+-- skips takes a 1-indexed list the same length as the input list and maps over
+-- it to produce a result with the same number of items as the original. Each
+-- index in that list is passed through a list comprehension consisting of the
+-- input list zipped with its indices. The indices are modded against the
+-- element being mapped; only the elements at indices with a modulus of 0 are
+-- kept.
 skips :: [a] -> [[a]]
-skips xs = [t xs x | x <- [0..length xs-1]]
+skips l = map (\x -> [i | (i, c) <- zip l [1..length l], mod c x == 0])  [1..length l]
 
 -- localMaxima creates a sliding window over the input list, stores each
 -- window step as a list of triples, and uses a list comprehension to extract
