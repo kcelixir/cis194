@@ -4,7 +4,7 @@ g = length
 
 skips s = map (\n -> [c | (c, i) <- zip s $ cycle [1..n], i == n]) [1..g s]
 
-localMaxima s = [b | (a, b, c) <- zip3 s (tail s) (drop 2 s), a < b && b > c]
+localMaxima s = [b | (a, b, c) <- zip3 s (tail s) $ drop 2 s, a < b && b > c]
 
 histogram l = unlines $ transpose [(replicate (b - g n) ' ') ++ n | n <- m]
     where m = [concat ["*" | x <-l, x == i] ++ "=" ++ show i| i <- [0..9]]
