@@ -56,7 +56,7 @@ instance Expr MinMax where
 
 newtype Mod7 = Mod7 Integer deriving (Eq, Show)
 instance Expr Mod7 where
-   lit x = Mod7 $ x `mod` 7
+   lit x                 = Mod7 $ x `mod` 7
    add (Mod7 x) (Mod7 y) = Mod7 $ (x + y) `mod` 7
    mul (Mod7 x) (Mod7 y) = Mod7 $ (x * y) `mod` 7
 
