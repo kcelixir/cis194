@@ -82,15 +82,15 @@ fibs3 = x / (1 - x - x^2)
 ----------
 -- Ex 7 --
 ----------
-data Matrix = R2xC2 Integer Integer
-                    Integer Integer
+data Matrix = R2C2 Integer Integer
+                   Integer Integer
    deriving Show
 
 instance Num Matrix where
-   R2xC2 a b c d * R2xC2 w x y z = R2xC2 (a*w + b*y) (a*x + b*z)
-                                         (c*w + d*y) (c*x + d*z)
+   R2C2 a b c d * R2C2 w x y z = R2C2 (a*w + b*y) (a*x + b*z)
+                                      (c*w + d*y) (c*x + d*z)
 
 fib4 :: Integer -> Integer
 fib4 0 = 0
 fib4 1 = 1
-fib4 x = f where R2xC2 f _ _ _ = (R2xC2 1 1 1 0) ^ (x - 1)
+fib4 x = f where R2C2 f _ _ _ = (R2C2 1 1 1 0) ^ (x - 1)
