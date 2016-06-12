@@ -1,15 +1,13 @@
 :set -i../../
 :set prompt "> "
 :l Fibonacci.hs
--- :l ../../../test/Cis194/Hw/CalcSpec.hs
+:l ../../../test/Cis194/Hw/FibonacciSpec.hs
 
--- main
-
-True
+main
 
 take 10 fibs2
 
-foldr Cons Empty [1..1000]
+foldr Cons (streamRepeat 0) [1..1000]
 
 streamRepeat 5
 
@@ -22,3 +20,7 @@ nats
 interleaveStream (streamRepeat 0) (streamRepeat 1)
 
 ruler
+
+fibs3
+
+fib4 20

@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
 module Cis194.Hw.Fibonacci where
 
 import Data.List
@@ -5,19 +7,10 @@ import Data.List
 ----------
 -- Ex 1 --
 ----------
-
--- Translate the above definition of Fibonacci numbers directly into a
--- recursive function definition of type:
---
 fib :: Integer -> Integer
 fib 0 = 0
 fib 1 = 1
-fib n = (fib (n - 2)) + (fib (n - 1))
---
--- so that fib n computes the nth Fibonacci number Fn. Then, use fib to
--- define the infinite list of all Fibonacci numbers:
---
--- fibs1 :: [Integer]
+fib n = fib (n - 2) + fib (n - 1)
 
 fibs1 :: [Integer]
 fibs1 = map fib [0..]
@@ -25,39 +18,15 @@ fibs1 = map fib [0..]
 ----------
 -- Ex 2 --
 ----------
-
--- Define the infinite list:
---
--- fibs2 :: [Integer]
---
--- so that it has the same elements as fibs, but computing the first n
--- elements of fibs2 requires only O(n) addition operations. Be sure to
--- use standard recursion pattern(s) from Prelude, as appropriate.
---
 fibs2 :: [Integer]
 fibs2 = map fst $ iterate (\(x, y) -> (y, x + y)) (0, 1)
 
 ----------
 -- Ex 3 --
 ----------
-
--- * Define a data type of polymorphic streams, Stream.
--- * Write a function to convert a Stream to an infinite list:
---
---   streamToList :: Stream a -> [a]
---
--- * Make your own instance of Show for Stream:
---
---   instance Show a => Show (Stream a) where
---     show ...
---
---   ...which works by showing only some prefix of a stream (say, the first
---   20 elements)
-data Stream a = Empty
-              | Cons a (Stream a)
+data Stream a = Cons a (Stream a)
 
 streamToList :: Stream a -> [a]
-streamToList Empty       = []
 streamToList (Cons x xs) = x:streamToList xs
 
 instance Show a => Show (Stream a) where
@@ -66,34 +35,10 @@ instance Show a => Show (Stream a) where
 ----------
 -- Ex 4 --
 ----------
-
--- * Write a function:
---
--- streamRepeat :: a -> Stream a
---
--- ...which generates a stream containing infinitely many copies of the
--- given element
---
--- * Write a function:
---
--- streamMap :: (a -> b) -> Stream a -> Stream b
---
--- ...which applies a function to every element of a Stream
---
--- * Write a function:
---
--- streamFromSeed :: (a -> a) -> a -> Stream a
---
--- ...which generates a Stream from a “seed” of type a, which is the first
--- element of the stream, and an “unfolding rule” of type a -> a which
--- specifies how to transform the seed into a new seed, to be used for
--- generating the rest of the stream.
-
 streamRepeat :: a -> Stream a
 streamRepeat x = Cons x $ streamRepeat x
 
 streamMap :: (a -> b) -> Stream a -> Stream b
-streamMap _ Empty       = Empty
 streamMap f (Cons x xs) = Cons (f x) $ streamMap f xs
 
 streamFromSeed :: (a -> a) -> a -> Stream a
@@ -102,28 +47,6 @@ streamFromSeed f x = Cons x $ streamFromSeed f $ f x
 ----------
 -- Ex 5 --
 ----------
-
--- * Define the stream:
---
--- nats :: Stream Integer
---
--- ...which contains the infinite list of natural numbers 0, 1, 2...
---
--- * Define the stream:
---
--- ruler :: Stream Integer
---
--- ...which corresponds to the ruler function:
---
--- 0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,...
---
--- ...where the nth element in the stream (assuming the first element
--- corresponds to n = 1) is the largest power of 2 which evenly divides n.
---
--- Hint: define a function interleaveStreams which alternates the
--- elements from two streams. Can you use this function to implement ruler
--- in a clever way that does not have to do any divisibility testing?
-
 nats :: Stream Integer
 nats = streamFromSeed (+1) 0
 
@@ -132,3 +55,42 @@ interleaveStream (Cons x xs) ys = Cons x $ interleaveStream ys xs
 
 ruler :: Stream Integer
 ruler = foldr1 interleaveStream $ map streamRepeat [0..]
+
+----------
+-- Ex 6 --
+----------
+x :: Stream Integer
+x = Cons 0 $ Cons 1 $ streamRepeat 0
+
+instance Num (Stream Integer) where
+   fromInteger n               = Cons n $ streamRepeat 0
+   negate                      = streamMap (*(-1))
+   Cons a0 a' + Cons b0 b'     = Cons (a0 + b0) (a' + b')
+   Cons a0 a' * b@(Cons b0 b') = Cons (a0 * b0) $
+                                      (streamMap (*a0) b') + a' * b
+
+instance Fractional (Stream Integer) where
+   Cons a0 a' / Cons 0 b'          = Cons a0 a' / b'
+   a@(Cons a0 a') / b@(Cons b0 b') = Cons (a0 `div` b0) $
+                                          streamMap (flip div b0)
+                                                    (a' - q * b')
+                                     where q = a / b
+
+fibs3 :: Stream Integer
+fibs3 = x / (1 - x - x^2)
+
+----------
+-- Ex 7 --
+----------
+data Matrix = R2xC2 Integer Integer
+                    Integer Integer
+   deriving Show
+
+instance Num Matrix where
+   R2xC2 a b c d * R2xC2 w x y z = R2xC2 (a*w + b*y) (a*x + b*z)
+                                         (c*w + d*y) (c*x + d*z)
+
+fib4 :: Integer -> Integer
+fib4 0 = 0
+fib4 1 = 1
+fib4 x = f where R2xC2 f _ _ _ = (R2xC2 1 1 1 0) ^ (x - 1)
