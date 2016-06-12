@@ -1,5 +1,7 @@
 module Cis194.Hw.Fibonacci where
 
+import Data.List
+
 ----------
 -- Ex 1 --
 ----------
@@ -8,7 +10,9 @@ module Cis194.Hw.Fibonacci where
 -- recursive function definition of type:
 --
 fib :: Integer -> Integer
-fib _ = 0
+fib 0 = 0
+fib 1 = 1
+fib n = (fib (n - 2)) + (fib (n - 1))
 --
 -- so that fib n computes the nth Fibonacci number Fn. Then, use fib to
 -- define the infinite list of all Fibonacci numbers:
@@ -16,7 +20,7 @@ fib _ = 0
 -- fibs1 :: [Integer]
 
 fibs1 :: [Integer]
-fibs1 = []
+fibs1 = map fib [0..]
 
 ----------
 -- Ex 2 --
@@ -30,7 +34,8 @@ fibs1 = []
 -- elements of fibs2 requires only O(n) addition operations. Be sure to
 -- use standard recursion pattern(s) from Prelude, as appropriate.
 --
-
+fibs2 :: [Integer]
+fibs2 = map fst $ iterate (\(x, y) -> (y, x + y)) (0, 1)
 
 ----------
 -- Ex 3 --
@@ -48,6 +53,15 @@ fibs1 = []
 --
 --   ...which works by showing only some prefix of a stream (say, the first
 --   20 elements)
+data Stream a = Empty
+              | Cons a (Stream a)
+
+streamToList :: Stream a -> [a]
+streamToList Empty       = []
+streamToList (Cons x xs) = x:streamToList xs
+
+instance Show a => Show (Stream a) where
+   show = show . take 20 . streamToList
 
 ----------
 -- Ex 4 --
@@ -75,6 +89,16 @@ fibs1 = []
 -- specifies how to transform the seed into a new seed, to be used for
 -- generating the rest of the stream.
 
+streamRepeat :: a -> Stream a
+streamRepeat x = Cons x $ streamRepeat x
+
+streamMap :: (a -> b) -> Stream a -> Stream b
+streamMap _ Empty       = Empty
+streamMap f (Cons x xs) = Cons (f x) $ streamMap f xs
+
+streamFromSeed :: (a -> a) -> a -> Stream a
+streamFromSeed f x = Cons x $ streamFromSeed f $ f x
+
 ----------
 -- Ex 5 --
 ----------
@@ -99,3 +123,12 @@ fibs1 = []
 -- Hint: define a function interleaveStreams which alternates the
 -- elements from two streams. Can you use this function to implement ruler
 -- in a clever way that does not have to do any divisibility testing?
+
+nats :: Stream Integer
+nats = streamFromSeed (+1) 0
+
+interleaveStream :: (Stream Integer) -> (Stream Integer) -> (Stream Integer)
+interleaveStream (Cons x xs) ys = Cons x $ interleaveStream ys xs
+
+ruler :: Stream Integer
+ruler = foldr1 interleaveStream $ map streamRepeat [0..]
