@@ -1,5 +1,7 @@
 module Cis194.Hw.Fibonacci where
 
+import Data.List
+
 ----------
 -- Ex 1 --
 ----------
@@ -8,7 +10,9 @@ module Cis194.Hw.Fibonacci where
 -- recursive function definition of type:
 --
 fib :: Integer -> Integer
-fib _ = 0
+fib 0 = 0
+fib 1 = 1
+fib x = fib (x - 1) + fib (x - 2) 
 --
 -- so that fib n computes the nth Fibonacci number Fn. Then, use fib to
 -- define the infinite list of all Fibonacci numbers:
@@ -16,7 +20,7 @@ fib _ = 0
 -- fibs1 :: [Integer]
 
 fibs1 :: [Integer]
-fibs1 = []
+fibs1 = map fib [0..]
 
 ----------
 -- Ex 2 --
@@ -24,13 +28,15 @@ fibs1 = []
 
 -- Define the infinite list:
 --
--- fibs2 :: [Integer]
+
+fibs2 :: [Integer]
+fibs2 = 0 : unfoldr (\xs -> Just(last xs, [last xs, sum xs])) [0,1]
+
 --
 -- so that it has the same elements as fibs, but computing the first n
 -- elements of fibs2 requires only O(n) addition operations. Be sure to
 -- use standard recursion pattern(s) from Prelude, as appropriate.
 --
-
 
 ----------
 -- Ex 3 --
