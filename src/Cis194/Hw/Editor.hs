@@ -16,6 +16,10 @@ import Control.Arrow       (first, second)
 import Data.Char
 import Data.List
 
+instance Applicative (Editor b) where
+    pure = return
+    (<*>) = ap
+
 -- Editor commands
 
 data Command = View
@@ -107,7 +111,7 @@ doCommand Edit = do
   modBuffer $ replaceLine l new
 
 doCommand (Load filename) = do
-  mstr <- io $ handle (\(_ :: IOException) -> 
+  mstr <- io $ handle (\(_ :: IOException) ->
                          putStrLn "File not found." >> return Nothing
                       ) $ do
                  h <- openFile filename ReadMode
