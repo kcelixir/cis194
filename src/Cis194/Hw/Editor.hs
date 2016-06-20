@@ -1,11 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving
            , ScopedTypeVariables
    #-}
-module Editor where
+module Cis194.Hw.Editor where
 
 import System.IO
 
-import Buffer
+import Cis194.Hw.Buffer
 
 import Control.Exception
 import Control.Monad.State
@@ -92,7 +92,7 @@ doCommand :: Buffer b => Command -> Editor b ()
 doCommand View = do
   cur  <- getCurLine
   let ls = [(cur - 2) .. (cur + 2)]
-  ss <- mapM (\l -> onBuffer $ line l) ls
+  ss <- mapM (onBuffer . line) ls
   zipWithM_ (showL cur) ls ss
  where
   showL _ _ Nothing  = return ()
@@ -107,7 +107,7 @@ doCommand Edit = do
   modBuffer $ replaceLine l new
 
 doCommand (Load filename) = do
-  mstr <- io $ handle (\(_ :: IOException) -> 
+  mstr <- io $ handle (\(_ :: IOException) ->
                          putStrLn "File not found." >> return Nothing
                       ) $ do
                  h <- openFile filename ReadMode

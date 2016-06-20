@@ -17,6 +17,7 @@ Library
   Other-Modules:
   Build-Depends:        base >= 4 && < 5
                       , containers
+                      , mtl >= 2.2 && < 3
 
 Test-Suite spec
   Type:                 exitcode-stdio-1.0
