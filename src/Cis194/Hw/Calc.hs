@@ -1,7 +1,10 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Cis194.Hw.Calc where
 
 import           Cis194.Hw.ExprT
 import           Cis194.Hw.Parser
+import qualified Data.Map         as M
 
 eval :: ExprT -> Integer
 eval (Lit i) = i
@@ -51,6 +54,40 @@ times :: Mod7 -> Mod7 -> Mod7
 times (Mod7 x) (Mod7 y) = Mod7 (mod7 (x * y))
 
 instance Expr Mod7 where
-  lit = Mod7 . (`mod` 7)
+  lit = Mod7 . mod7
   add = plus
   mul = times
+
+
+class HasVars a where
+  var :: String -> a
+
+data VarExprT = VLit Integer
+             | Var String
+             | VAdd VarExprT VarExprT
+             | VMul VarExprT VarExprT
+    deriving (Show, Eq)
+
+instance HasVars VarExprT where
+  var = Var
+
+instance Expr VarExprT where
+  lit = VLit
+  add = VAdd
+  mul = VMul
+
+instance HasVars (M.Map String Integer -> Maybe Integer) where
+  var k = M.lookup k
+
+instance Expr (M.Map String Integer -> Maybe Integer) where
+  lit x
+    | M.notMember x = Nothing
+    | otherwise = M.lookup x
+  add x y
+    | _ M.notMember y = Nothing
+    | M.notMember x $ _ = Nothing
+    | otherwise = M.lookup x + M.lookup y
+  mul x y
+    | _ M.notMember y = Nothing
+    | M.notMember x $ _ = Nothing
+    | otherwise = M.lookup x * M.lookup y
