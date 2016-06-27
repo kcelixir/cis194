@@ -9,3 +9,6 @@ main = runEditor editor $ unlines
          , "To load a different file, type the character L followed"
          , "by the name of the file."
          ]
+
+
+-- runhaskell StringBufEditor.hs
