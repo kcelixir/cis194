@@ -8,56 +8,29 @@ import Cis194.Hw.AParser
 import Control.Applicative
 import Data.Char
 
-------------------------------------------------------------
---  1. Parsing repetitions
-------------------------------------------------------------
+type Ident = String
 
--- Hint: To parse one or more occurrences of p, run p once
--- and then parse zero or more occurrences of p.
+data Atom = N Integer
+          | I Ident
+  deriving Show
+
+data SExpr = A Atom
+           | Comb [SExpr]
+  deriving Show
 
 oneOrMore :: Parser a -> Parser [a]
 oneOrMore = some
-{-oneOrMore p = (:) <$> p <*> zeroOrMore p-}
-
--- To parse zero or more occurrences of p, try parsing one
--- or more; if that fails, return the empty list.
 
 zeroOrMore :: Parser a -> Parser [a]
 zeroOrMore = many
-{-zeroOrMore p = oneOrMore p <|> pure []-}
-
-------------------------------------------------------------
---  2. Utilities
-------------------------------------------------------------
-
--- First, spaces should parse a consecutive list of zero or
--- more whitespace characters.
 
 spaces :: Parser String
-spaces = many $ char ' '
-
--- Next, ident should parse an identifier, which for our
--- purposes will be an alphabetic character (use isAlpha)
--- followed by zero or more alphanumeric characters (use
--- isAlphaNum).
+spaces = zeroOrMore (char ' ')
 
 ident :: Parser String
-ident = (:) <$> satisfy isAlpha <*> many satisfy isAlphaNum
+ident = (:) <$> satisfy isAlpha <*> zeroOrMore (satisfy isAlphaNum)
 
-------------------------------------------------------------
---  3. Parsing S-expressions
-------------------------------------------------------------
-
--- An "identifier" is represented as just a String; however, only
--- those Strings consisting of a letter followed by any number of
--- letters and digits are valid identifiers.
-type Ident = String
-
--- An "atom" is either an integer value or an identifier.
-data Atom = N Integer | I Ident
-  deriving (Show, Eq)
-
--- An S-expression is either an atom, or a list of S-expressions.
-data SExpr = A Atom
-           | Comb [SExpr]
-  deriving (Show, Eq)
+parseSExpr :: Parser SExpr
+parseSExpr = spaces *> ( A <$> atom <|> Comb <$> sexpr ) <* spaces where
+  atom  = N <$> posInt <|> I <$> ident
+  sexpr = char '(' *> oneOrMore parseSExpr <* char ')'
