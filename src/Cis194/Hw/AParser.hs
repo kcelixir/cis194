@@ -58,15 +58,28 @@ posInt = Parser f
 -- You may find it useful to implement:
 -- first :: (a -> b) -> (a,c) -> (b,c)
 
+first :: (a -> b) -> (a, c) -> (b, c)
+first f (a, c) = (f a, c)
+
+instance Functor Parser where
+  fmap f (Parser g) = Parser (\s -> first f <$> g s)
 
 -- Ex. 2 - implement an Applicative instance for Parser
 --
 --  pure a represents the parser which consumes no input and successfully returns a result of a.
---  p1 <*> p2 represents the parser which ﬁrst runs p1 (which will consume some input and 
--- produce a function), then passes the remaining input to p2 (which consumes more input 
+--  p1 <*> p2 represents the parser which ﬁrst runs p1 (which will consume some input and
+-- produce a function), then passes the remaining input to p2 (which consumes more input
 -- and produces some value), then returns the result of applying the function to the
 -- value. However, if either p1 or p2 fails then the whole thing should also fail (put another
 -- way, p1 <*> p2 only succeeds if both p1 and p2 succeed).
+
+instance Applicative Parser where
+  pure a = Parser (\s -> Just (a, s))
+  (Parser p1) <*> (Parser p2) = Parser f
+    where
+      f2 Nothing = Nothing
+      f2 (Just (f1, s)) = first f1 <$> p2 s
+      f s = f2 $ p1 s
 
 
 -- Ex. 3a - Create a parser:
@@ -74,20 +87,31 @@ posInt = Parser f
 --   abParser :: Parser (Char, Char)
 --
 -- which expects to see the characters ’a’ and ’b’ and returns them as a pair
+abParser :: Parser (Char, Char)
+abParser = Parser f <*> char 'b'
+  where
+    f [] = Nothing
+    f ('a':xs) = Just (\c -> ('a', c), xs)
+    f _ = Nothing
 
 -- Ex. 3b - Create a parser:
 --
 --   abParser_ :: Parser ()
 --
 -- which acts in the same way as abParser but returns () instead of 'a' and 'b'
+abParser_ :: Parser ()
+abParser_ = Parser f <*> char 'b'
+  where
+    f [] = Nothing
+    f ('a':xs) = Just (const (), xs)
+    f _ = Nothing
 
 -- Ex. 3c - Create a parser:
 --
---   intPair 
+--   intPair
 --
--- which reads two integer values separated by a space and returns the integer 
+-- which reads two integer values separated by a space and returns the integer
 -- values in a list. You should use the provided posInt to parse the integer values.
-
 
 -- Ex. 4 - Write an Alternative instance for Parser
 --
@@ -103,11 +127,5 @@ posInt = Parser f
 -- Ex. 5 - Implement a parser:
 --
 --  intOrUppercase :: Parser ()
--- 
+--
 -- which parses either an integer value or an uppercase character, and fails otherwise.
-
-
-
-
-
-
