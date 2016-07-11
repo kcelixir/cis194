@@ -49,43 +49,45 @@ posInt = Parser f
       | otherwise = Just (read ns, rest)
       where (ns, rest) = span isDigit xs
 
-------------------------------------------------------------
--- Your code goes below here
-------------------------------------------------------------
+-----------
+-- Ex. 1 --
+-----------
+first :: (a -> b) -> (a, c) -> (b, c)
+first f (a, c) = (f a, c)
 
--- Ex. 1 - implement a Functor instance for Parser
---
--- You may find it useful to implement:
--- first :: (a -> b) -> (a,c) -> (b,c)
+instance Functor Parser where
+   fmap f p = Parser g
+              where g s = first f <$> runParser p s
 
+-----------
+-- Ex. 2 --
+-----------
+instance Applicative Parser where
+   pure a    = Parser g
+               where g s = Just (a, s)
+   p1 <*> p2 = Parser g
+               where g s1 = case runParser p1 s1 of
+                            Just (f2, s2) -> case runParser p2 s2 of
+                                             Just (v2, s3) -> Just (f2 v2, s3)
+                                             Nothing       -> Nothing
+                            Nothing       -> Nothing
 
--- Ex. 2 - implement an Applicative instance for Parser
---
---  pure a represents the parser which consumes no input and successfully returns a result of a.
---  p1 <*> p2 represents the parser which ﬁrst runs p1 (which will consume some input and 
--- produce a function), then passes the remaining input to p2 (which consumes more input 
--- and produces some value), then returns the result of applying the function to the
--- value. However, if either p1 or p2 fails then the whole thing should also fail (put another
--- way, p1 <*> p2 only succeeds if both p1 and p2 succeed).
+-----------
+-- Ex. 3 --
+-----------
+abParser :: Parser (Char, Char)
+abParser = (,) <$> char 'a' <*> char 'b'
 
+abParser_ :: Parser ()
+abParser_ = const . const () <$> char 'a' <*> char 'b'
 
--- Ex. 3a - Create a parser:
---
---   abParser :: Parser (Char, Char)
---
--- which expects to see the characters ’a’ and ’b’ and returns them as a pair
-
--- Ex. 3b - Create a parser:
---
---   abParser_ :: Parser ()
---
--- which acts in the same way as abParser but returns () instead of 'a' and 'b'
+-- intPair :: Parser [Int]
 
 -- Ex. 3c - Create a parser:
 --
---   intPair 
+--   intPair
 --
--- which reads two integer values separated by a space and returns the integer 
+-- which reads two integer values separated by a space and returns the integer
 -- values in a list. You should use the provided posInt to parse the integer values.
 
 
@@ -103,7 +105,7 @@ posInt = Parser f
 -- Ex. 5 - Implement a parser:
 --
 --  intOrUppercase :: Parser ()
--- 
+--
 -- which parses either an integer value or an uppercase character, and fails otherwise.
 
 
