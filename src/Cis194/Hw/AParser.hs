@@ -41,7 +41,7 @@ Just ('x',"yz")
 
 -- For convenience, we've also provided a parser for positive
 -- integers.
-posInt :: Parser Integer
+posInt :: Parser Int
 posInt = Parser f
   where
     f xs
@@ -56,21 +56,19 @@ first :: (a -> b) -> (a, c) -> (b, c)
 first f (a, c) = (f a, c)
 
 instance Functor Parser where
-   fmap f p = Parser g
-              where g s = first f <$> runParser p s
+   fmap f (Parser p) = Parser (\s -> first f <$> p s)
 
 -----------
 -- Ex. 2 --
 -----------
 instance Applicative Parser where
-   pure a    = Parser g
-               where g s = Just (a, s)
-   p1 <*> p2 = Parser g
-               where g s1 = case runParser p1 s1 of
-                            Just (f2, s2) -> case runParser p2 s2 of
-                                             Just (v2, s3) -> Just (f2 v2, s3)
-                                             Nothing       -> Nothing
-                            Nothing       -> Nothing
+   pure a                  = Parser (\s -> Just (a, s))
+   Parser p1 <*> Parser p2 = Parser (\s -> p1 s >>= f1)
+                             where f1 (f2, s2) = first f2 <$> p2 s2
+-- without monad assumption for Maybe (>>=)
+--   Parser p1 <*> Parser p2 = Parser (\s1 -> case p1 s1 of
+--                                            Just (f2, s2) -> first f2 <$> p2 s2
+--                                            Nothing       -> Nothing)
 
 -----------
 -- Ex. 3 --
@@ -81,35 +79,19 @@ abParser = (,) <$> char 'a' <*> char 'b'
 abParser_ :: Parser ()
 abParser_ = const . const () <$> char 'a' <*> char 'b'
 
--- intPair :: Parser [Int]
+intPair :: Parser [Int]
+intPair = f <$> posInt <*> (const 0 <$> satisfy isSpace) <*> posInt
+          where f x _ y = [x, y]
 
--- Ex. 3c - Create a parser:
---
---   intPair
---
--- which reads two integer values separated by a space and returns the integer
--- values in a list. You should use the provided posInt to parse the integer values.
+-----------
+-- Ex. 4 --
+-----------
+instance Alternative Parser where
+   empty                   = Parser $ const Nothing
+   Parser p1 <|> Parser p2 = Parser (\s -> p1 s <|> p2 s)
 
-
--- Ex. 4 - Write an Alternative instance for Parser
---
--- See: http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Applicative.html#t:Alternative
---
--- empty represents the parser which always fails.
--- p1 <|> p2 represents the parser which ﬁrst tries running p1. If p1 succeeds then p2 is
--- ignored and the result of p1 is returned.  Otherwise, if p1 fails, then p2 is tried instead.
---
--- Hint: there is already an Alternative instance for Maybe which you may find useful.
-
-
--- Ex. 5 - Implement a parser:
---
---  intOrUppercase :: Parser ()
---
--- which parses either an integer value or an uppercase character, and fails otherwise.
-
-
-
-
-
-
+-----------
+-- Ex. 5 --
+-----------
+intOrUppercase :: Parser ()
+intOrUppercase = const () <$> satisfy isUpper <|> const () <$> posInt
