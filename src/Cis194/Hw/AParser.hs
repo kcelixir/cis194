@@ -80,8 +80,8 @@ abParser_ :: Parser ()
 abParser_ = const . const () <$> char 'a' <*> char 'b'
 
 intPair :: Parser [Int]
-intPair = f <$> posInt <*> (const 0 <$> satisfy isSpace) <*> posInt
-          where f x _ y = [x, y]
+intPair = f <$> posInt <* satisfy isSpace <*> posInt
+          where f x y = [x, y]
 
 -----------
 -- Ex. 4 --

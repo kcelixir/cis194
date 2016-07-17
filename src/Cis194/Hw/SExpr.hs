@@ -9,6 +9,24 @@ import Control.Applicative
 import Data.Char
 
 ------------------------------------------------------------
+--  0. Examples
+------------------------------------------------------------
+-- (*>) :: Applicative f => f a -> f b -> f b
+-- (*>) = liftA2 (\x y -> y)
+
+consA :: Applicative f => f a -> f [a] -> f [a]
+consA x xs = (:) <$> x <*> xs
+
+sequenceA :: Applicative f => [f a] -> f [a]
+sequenceA xs = foldr consA (pure []) xs
+
+mapA :: Applicative f => (a -> f b) -> ([a] -> f [b])
+mapA f = (\xs -> Cis194.Hw.SExpr.sequenceA (map f xs))
+
+replicateA :: Applicative f => Int -> f a -> f [a]
+replicateA n x = Cis194.Hw.SExpr.sequenceA (replicate n x)
+
+------------------------------------------------------------
 --  1. Parsing repetitions
 ------------------------------------------------------------
 
@@ -54,10 +72,19 @@ ident = (:) <$> (satisfy isAlpha) <*> many (satisfy isAlphaNum)
 type Ident = String
 
 -- An "atom" is either an integer value or an identifier.
-data Atom = N Integer | I Ident
+data Atom = N Int | I Ident
   deriving (Show, Eq)
 
 -- An S-expression is either an atom, or a list of S-expressions.
 data SExpr = A Atom
            | Comb [SExpr]
   deriving (Show, Eq)
+
+atom :: Parser Atom
+atom =     N <$> posInt
+       <|> I <$> ident
+
+sexpr :: Parser SExpr
+sexpr = spaces *> sa <* spaces
+        where sa = A <$> atom <|> char '(' *> ss <* char ')'
+              ss = Comb <$> some sexpr
