@@ -75,11 +75,10 @@ instance Functor Parser where
 
 instance Applicative Parser where
   pure a = Parser (\s -> Just (a, s))
-  (Parser p1) <*> (Parser p2) = Parser f
-    where
-      f2 Nothing = Nothing
-      f2 (Just (f1, s)) = first f1 <$> p2 s
-      f s = f2 $ p1 s
+  (Parser p1) <*> (Parser p2) = Parser f where
+    f2 Nothing = Nothing
+    f2 (Just (f1, s)) = first f1 <$> p2 s
+    f s = f2 $ p1 s
 
 
 -- Ex. 3a - Create a parser:
@@ -88,23 +87,14 @@ instance Applicative Parser where
 --
 -- which expects to see the characters ’a’ and ’b’ and returns them as a pair
 abParser :: Parser (Char, Char)
-abParser = Parser f <*> char 'b'
-  where
-    f [] = Nothing
-    f ('a':xs) = Just (\c -> ('a', c), xs)
-    f _ = Nothing
-
+abParser = (,) <$> char 'a' <*> char 'b'
 -- Ex. 3b - Create a parser:
 --
 --   abParser_ :: Parser ()
 --
 -- which acts in the same way as abParser but returns () instead of 'a' and 'b'
 abParser_ :: Parser ()
-abParser_ = Parser f <*> char 'b'
-  where
-    f [] = Nothing
-    f ('a':xs) = Just (const (), xs)
-    f _ = Nothing
+abParser_ = (\_ _ -> ()) <$> char 'a' <*> char 'b'
 
 -- Ex. 3c - Create a parser:
 --
@@ -112,6 +102,8 @@ abParser_ = Parser f <*> char 'b'
 --
 -- which reads two integer values separated by a space and returns the integer
 -- values in a list. You should use the provided posInt to parse the integer values.
+intPair :: Parser [Integer]
+intPair = (\x y -> [x,y]) <$> (posInt <* char ' ') <*> posInt
 
 -- Ex. 4 - Write an Alternative instance for Parser
 --
@@ -122,10 +114,17 @@ abParser_ = Parser f <*> char 'b'
 -- ignored and the result of p1 is returned.  Otherwise, if p1 fails, then p2 is tried instead.
 --
 -- Hint: there is already an Alternative instance for Maybe which you may find useful.
-
+instance Alternative Parser where
+  empty = Parser $ const Nothing
+  p1 <|> p2 = Parser f where
+    f s = runParser p1 s <|> runParser p2 s
+  some p = (:) <$> p <*> many p
+  many p = some p <|> pure []
 
 -- Ex. 5 - Implement a parser:
 --
 --  intOrUppercase :: Parser ()
 --
 -- which parses either an integer value or an uppercase character, and fails otherwise.
+intOrUppercase :: Parser ()
+intOrUppercase = (posInt *> pure () ) <|> (satisfy isUpper *> pure ())

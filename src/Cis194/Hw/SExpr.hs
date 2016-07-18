@@ -4,9 +4,9 @@
 
 module Cis194.Hw.SExpr where
 
-import Cis194.Hw.AParser
-import Control.Applicative
-import Data.Char
+import           Cis194.Hw.AParser
+import           Control.Applicative
+import           Data.Char
 
 ------------------------------------------------------------
 --  1. Parsing repetitions
@@ -17,14 +17,14 @@ import Data.Char
 
 oneOrMore :: Parser a -> Parser [a]
 oneOrMore = some
-{-oneOrMore p = (:) <$> p <*> zeroOrMore p-}
+-- oneOrMore p = (:) <$> p <*> zeroOrMore p
 
 -- To parse zero or more occurrences of p, try parsing one
 -- or more; if that fails, return the empty list.
 
 zeroOrMore :: Parser a -> Parser [a]
 zeroOrMore = many
-{-zeroOrMore p = oneOrMore p <|> pure []-}
+-- zeroOrMore p = oneOrMore p <|> pure []
 
 ------------------------------------------------------------
 --  2. Utilities
@@ -34,7 +34,7 @@ zeroOrMore = many
 -- more whitespace characters.
 
 spaces :: Parser String
-spaces = many $ char ' '
+spaces = zeroOrMore $ char ' '
 
 -- Next, ident should parse an identifier, which for our
 -- purposes will be an alphabetic character (use isAlpha)
@@ -42,7 +42,7 @@ spaces = many $ char ' '
 -- isAlphaNum).
 
 ident :: Parser String
-ident = (:) <$> (satisfy isAlpha) <*> many (satisfy isAlphaNum)
+ident = (:) <$> satisfy isAlpha <*> zeroOrMore (satisfy isAlphaNum)
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
@@ -61,3 +61,15 @@ data Atom = N Integer | I Ident
 data SExpr = A Atom
            | Comb [SExpr]
   deriving (Show, Eq)
+
+openParen :: Parser Char
+openParen = satisfy (== '(')
+
+closeParen :: Parser Char
+closeParen = satisfy (== ')')
+
+parseAtom :: Parser Atom
+parseAtom = N <$> posInt <|> I <$> ident
+
+parseSExpr :: Parser SExpr
+parseSExpr = spaces *> (A <$> parseAtom <|> (Comb <$> (openParen *> some parseSExpr <* closeParen))) <* spaces
