@@ -20,6 +20,9 @@ instance Random DieValue where
 first :: (a -> b) -> (a, c) -> (b, c)
 first f (a, c) = (f a, c)
 
+rsort :: Ord l => [l] -> [l]
+rsort l = reverse $ sort l
+
 die :: Rand StdGen DieValue
 die = getRandom
 
@@ -33,7 +36,7 @@ battle :: Battlefield -> Rand StdGen Battlefield
 battle (Battlefield attackers defenders) = do
    ad <- dice $ min 3 $ attackers - 1
    dd <- dice $ min 2 $ defenders
-   let raids = zip (reverse $ sort ad) (reverse $ sort dd)
+   let raids = zip (rsort ad) (rsort dd)
    let routs = filter (uncurry (>)) raids
    return $ Battlefield (attackers - length raids + length routs)
                         (defenders - length routs)
@@ -53,9 +56,10 @@ invade field@(Battlefield attackers defenders) = do
 ----------
 successProb :: Battlefield -> Rand StdGen Double
 successProb field = do
-   invasions <- replicateM 1000 $ invade field
+   invasions <- replicateM n $ invade field
    let conquests = length $ filter (==0) $ map defenders invasions
-   return $ (fromIntegral conquests) / 1000
+   return $ (fromIntegral conquests) / fromIntegral n
+   where n = 10000
 
 ----------
 -- Ex 5 --
