@@ -5,19 +5,25 @@ module Cis194.Hw.Week1 where
 -------------
 
 toDigits :: Integer -> [Integer]
-toDigits x = [x]
+toDigits = reverse . toDigitsRev
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev x = [x]
+toDigitsRev x | x <= 0 = []
+toDigitsRev x = mod x 10 : toDigitsRev (div x 10)
 
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther xs = xs
+doubleEveryOther = flipMap (zipWith (*) (cycle [1, 2]))
+
+flipMap :: ([a] -> [b]) -> [a] -> [b]
+flipMap f = reverse . f . reverse
 
 sumDigits :: [Integer] -> Integer
-sumDigits _ = 0
+sumDigits = sum . concatMap toDigits
 
 validate :: Integer -> Bool
-validate _ = False
+validate card = rem (total card) 10 == 0
+  where
+    total = sumDigits . doubleEveryOther . toDigits
 
 ---------------------
 -- Towers of Hanoi --
