@@ -68,11 +68,11 @@ spec = do
     it "should solve for 2 discs" $ do
       (acceptHanoi3 hanoi 2) `shouldBe` Just (HanoiState3 [] [1..2] [])
 
-    {-it "should solve for 5 discs" $ do-}
-      {-(acceptHanoi3 hanoi 5) `shouldBe` Just (HanoiState3 [] [1..5] [])-}
+    it "should solve for 5 discs" $ do
+      (acceptHanoi3 hanoi 5) `shouldBe` Just (HanoiState3 [] [1..5] [])
 
-    {-it "should solve for 10 discs" $ do-}
-      {-(acceptHanoi3 hanoi 10) `shouldBe` Just (HanoiState3 [] [1..10] [])-}
+    it "should solve for 10 discs" $ do
+      (acceptHanoi3 hanoi 10) `shouldBe` Just (HanoiState3 [] [1..10] [])
 
   {- This is an optional assigment
   describe "hanoi4" $ do
