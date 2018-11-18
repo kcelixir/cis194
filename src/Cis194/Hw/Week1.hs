@@ -40,13 +40,15 @@ hanoi 1 a b _ = [(a, b)]
 hanoi 0 _ _ _ = []
 hanoi n a b c = (hanoi (n - 1) a c b) ++ (hanoi 1 a b c) ++ (hanoi (n - 1) c b a)
 
-
--- Produces sub-optimal solutions, i.e. does not find the minimal number of moves for the 15-disc test.
 hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
 hanoi4 2 a b c _ = [(a, c), (a, b), (c, b)]
 hanoi4 1 a b _ _ = [(a, b)]
 hanoi4 0 _ _ _ _ = []
-hanoi4 n a b c d = (hanoi4 (n - 2) a c b d) ++ (hanoi4 2 a b d c) ++ (hanoi4 (n - 2) c b a d)
+hanoi4 n a b c d =
+  (hanoi4 (n - m) a c b d) ++
+  (hanoi m a b d) ++
+  (hanoi4 (n - m) c b a d)
+  where m = floor (sqrt (fromIntegral (n * 2)))
 
 
 putHeading :: String -> IO ()
