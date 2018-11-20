@@ -34,19 +34,17 @@ type Move = (Peg, Peg)
 
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
 hanoi 0 _ _ _ = []
-hanoi 1 s t _ = [(s, t)]
 hanoi n s t a = next n s a t ++
-     hanoi 1 s t a ++
+     [(s, t)] ++
      next n a t s
      where
-       next = hanoi . (subtract 1)
+       next = hanoi . subtract 1
 
 hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
-hanoi4 0 _ _ _ _ = []
-hanoi4 1 s e _ _ = [(s, e)]
-hanoi4 2 s e i _ = [(s, i), (s, e), (i, e)]
-hanoi4 n s e i a = next n s a e i ++
+hanoi4 n s e i a
+  | n <= 2 = hanoi n s e i
+  | otherwise = next n s a e i ++
      hanoi4 2 s e i a ++
      next n a e i s
      where
-       next = hanoi4 . (subtract 2)
+       next = hanoi4 . subtract 2
