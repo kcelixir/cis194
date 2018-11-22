@@ -8,7 +8,7 @@ import Data.Char
 toDigits :: Integer -> [Integer]
 toDigits x
   | x < 1 = []
-  | otherwise = map (toInteger . digitToInt) (show x)
+  | otherwise = map (fromIntegral . digitToInt) (show x)
 
 toDigitsRev :: Integer -> [Integer]
 toDigitsRev x = foldl (flip (:)) [] (toDigits x)
@@ -27,10 +27,7 @@ isDivisibleBy :: Integer -> Integer -> Bool
 isDivisibleBy m x = mod x m == 0
 
 sumDigits :: [Integer] -> Integer
-sumDigits list = foldr (+) 0 (breakUpDigits list)
-
-breakUpDigits :: [Integer] -> [Integer]
-breakUpDigits list = list >>= toDigits
+sumDigits list = sum (list >>= toDigits)
 
 validate :: Integer -> Bool
 validate = (isDivisibleBy 10) . sumDigits . doubleEveryOther . toDigits
