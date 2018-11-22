@@ -11,19 +11,22 @@ parseError severity time msg =
 
 parseMessage :: String -> LogMessage
 parseMessage s = case words s of
-  ("E" : severity : time : rest) -> parseError severity time rest
-  ("I" : time : rest) -> LogMessage Info (read time) (unwords rest)
-  ("W" : time : rest) -> LogMessage Warning (read time) (unwords rest)
+  "E" : severity : time : rest -> parseError severity time rest
+  "I" : time : rest -> buildMessage Info time rest
+  "W" : time : rest -> buildMessage Warning time rest
   _ -> Unknown s
 
+buildMessage :: MessageType -> String -> [String] -> LogMessage
+buildMessage typ time msg = LogMessage typ (read time) (unwords msg)
+
 parse :: String -> [LogMessage]
-parse s = map parseMessage (lines s)
+parse = map parseMessage . lines
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert (Unknown _) tree = tree
+insert Unknown{} tree = tree
 insert msg Leaf = Node Leaf msg Leaf
 insert msg (Node left current right) =
-  if (timestamp msg) > (timestamp current)
+  if (timestamp msg) >= (timestamp current)
   then Node left current (insert msg right)
   else Node (insert msg left) current right
 
@@ -32,23 +35,24 @@ timestamp (LogMessage _ t _) = t
 timestamp (Unknown _) = error "Unknown message has no timestamp"
 
 build :: [LogMessage] -> MessageTree
-build messages = foldl (flip insert) Leaf messages
+build = foldl (flip insert) Leaf
 
 inOrder :: MessageTree -> [LogMessage]
-inOrder Leaf = []
-inOrder (Node left msg right) =
-  inOrder left ++ [msg] ++ inOrder right
+inOrder tree = go tree []
+  where
+    go (Node left msg right) = go left . (msg:) . go right
+    go Leaf = id
 
 message :: LogMessage -> String
 message (Unknown s) = s
 message (LogMessage _ _ s) = s
 
-onlySevere :: LogMessage -> Bool
-onlySevere (LogMessage (Error s) _ _) = s >= 50
-onlySevere _ = False
+isSevere :: LogMessage -> Bool
+isSevere (LogMessage (Error s) _ _) = s >= 50
+isSevere _ = False
 
 -- whatWentWrong takes an unsorted list of LogMessages, and returns a list of the
 -- messages corresponding to any errors with a severity of 50 or greater,
 -- sorted by timestamp.
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong = (map message) . (filter onlySevere) . inOrder . build
+whatWentWrong = map message . filter isSevere . inOrder . build
