@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
 module Cis194.Hw.Fibonacci where
 
 ----------
@@ -141,3 +142,43 @@ interleaveStreams (Cons i s) t = Cons i (interleaveStreams t s)
 ruler :: Stream Integer
 ruler = rulerN 0
   where rulerN n = interleaveStreams (streamRepeat n) (rulerN (n + 1))
+
+-- Exercise 6
+
+x :: Stream Integer
+x = Cons 0 $ Cons 1 $ streamRepeat 0
+
+instance Num (Stream Integer) where
+  fromInteger n = Cons n (streamRepeat 0)
+  negate = fmap negate
+  (+) (Cons i s) (Cons j t) = Cons (i + j) $ s + t
+  (*) (Cons a0 a') b@(Cons b0 b') = Cons (a0 * b0) $ fromInteger a0 * b' + a' * b
+
+instance Fractional (Stream Integer) where
+  (/) a@(Cons a0 a') b@(Cons b0 b') =
+    Cons (div a0 b0)
+    $ (a' - (a / b) * b') / (fromInteger b0)
+
+fibs3 :: Stream Integer
+fibs3 = x / (1 - x - x * x)
+
+-- Exercise 7
+
+data Matrix = Matrix Integer Integer Integer Integer
+
+dot :: (Integer, Integer) -> (Integer, Integer) -> Integer
+dot (a, b) (c, d) = a * c + b * d
+
+instance Num Matrix where
+  (*) (Matrix a b c d) (Matrix e f g h) =
+    Matrix (dot (a, b) (e, g)) (dot (a, b) (f, h))
+           (dot (c, d) (e, g)) (dot (c, d) (f, h))
+
+fib4 :: Integer -> Integer
+fib4 0 = 0
+fib4 n =
+  let (Matrix _ f _ _) = Matrix 1 1 1 0 ^ n
+  in f
+
+fibs4 :: [Integer]
+fibs4 = map fib4 [0..]
