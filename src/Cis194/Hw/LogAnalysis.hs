@@ -28,7 +28,7 @@ insert n@(LogMessage _ nt _) (Node l m@(LogMessage _ mt _) r)
 insert _ t = t
 
 build :: [LogMessage] -> MessageTree
-build = foldr insert Leaf . reverse
+build = foldl (flip insert) Leaf
 
 inOrder :: MessageTree -> [LogMessage]
 inOrder t = go t []
